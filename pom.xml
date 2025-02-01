@@ -1,0 +1,59 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.github.qylh</groupId>
+    <artifactId>IrisRPC</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>IrisRPC</name>
+    <url>http://maven.apache.org</url>
+    <modules>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <spotless.version>2.27.2</spotless.version>
+        <irisRPC.root.dir>${project.basedir}</irisRPC.root.dir>
+    </properties>
+    <build>
+    <plugins>
+        <plugin>
+            <groupId>com.diffplug.spotless</groupId>
+            <artifactId>spotless-maven-plugin</artifactId>
+            <version>${spotless.version}</version>
+            <configuration>
+                <java>
+                    <eclipse>
+                        <file>${irisRPC.root.dir}/codestyle/spotless_irisrpc_formatter.xml</file>
+                    </eclipse>
+                    <licenseHeader>
+                        <file>${irisRPC.root.dir}/codestyle/license-header</file>
+                    </licenseHeader>
+                </java>
+            </configuration>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>apply</goal>
+                    </goals>
+                    <phase>compile</phase>
+                </execution>
+            </executions>
+        </plugin>
+        </plugins>
+    </build>
+    <dependencyManagement>
+        <dependencies>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+
+    </dependencies>
+</project>
