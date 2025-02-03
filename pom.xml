@@ -10,6 +10,7 @@
     <name>IrisRPC</name>
     <url>http://maven.apache.org</url>
     <modules>
+        <module>Iris-common</module>
     </modules>
 
     <properties>
@@ -20,6 +21,7 @@
         <irisRPC.root.dir>${project.basedir}</irisRPC.root.dir>
         <spotless.version>2.27.2</spotless.version>
         <paho.version>1.2.5</paho.version>
+        <jackson.version>2.18.2</jackson.version>
     </properties>
     <build>
     <plugins>
@@ -30,11 +32,17 @@
             <configuration>
                 <java>
                     <eclipse>
-                        <file>${irisRPC.root.dir}/codestyle/spotless_irisrpc_formatter.xml</file>
+                        <file>./codestyle/spotless_irisrpc_formatter.xml</file>
                     </eclipse>
                     <licenseHeader>
-                        <file>${irisRPC.root.dir}/codestyle/license-header</file>
+                        <file>./codestyle/license-header</file>
                     </licenseHeader>
+                    <removeUnusedImports />
+                    <replaceRegex>
+                        <name>Remove wildcard imports</name>
+                        <searchRegex>import\s+[^\*\s]+\*;(\r\n|\r|\n)</searchRegex>
+                        <replacement>$1</replacement>
+                    </replaceRegex>
                 </java>
             </configuration>
             <executions>
@@ -55,10 +63,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>org.eclipse.paho</groupId>
-            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
-            <version>${paho.version}</version>
-        </dependency>
+
     </dependencies>
 </project>
