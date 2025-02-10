@@ -16,7 +16,7 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.serializer;
+package io.github.qylh.common.serializer;
 
 import lombok.Data;
 import org.junit.Assert;
