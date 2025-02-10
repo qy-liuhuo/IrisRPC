@@ -36,7 +36,7 @@ public class JsonSerializerTest {
         private Date birthday;
         private String[] friends;
     }
-
+    
     @Test
     public void testDeserialize() {
         Person person = JsonSerializer.deserialize("{\"name\":\"Tom\",\"age\":18,\"birthday\":\"2021-07-01 00:00:00\",\"friends\":[\"Alice\",\"Bob\"]}", Person.class);
