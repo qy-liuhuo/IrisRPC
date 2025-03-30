@@ -20,26 +20,32 @@ package io.github.qylh.common.mqtt.client;
 
 import io.github.qylh.common.mqtt.MqttClientException;
 import io.github.qylh.common.mqtt.MqttConnectionConfig;
+import io.github.qylh.common.mqtt.MqttMsg;
+import io.github.qylh.common.mqtt.MqttMsgListener;
+import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
 public class PahoMqttClient extends MqttClient {
     
     private org.eclipse.paho.client.mqttv3.MqttClient mqttClient;
+
     
     @Override
-    public void connect(MqttConnectionConfig mqttConnectionConfig) {
+    public void connect(MqttConnectionConfig mqttConnectionConfig) throws MqttClientException {
         try {
             this.mqttClient = new org.eclipse.paho.client.mqttv3.MqttClient(mqttConnectionConfig.getBroker(), mqttConnectionConfig.getClientId());
             MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
-            mqttConnectOptions.setUserName(mqttConnectionConfig.getUsername());
-            mqttConnectOptions.setPassword(mqttConnectionConfig.getPassword().toCharArray());
+            if (mqttConnectionConfig.getUsername() != null && mqttConnectionConfig.getPassword() != null) {
+                mqttConnectOptions.setUserName(mqttConnectionConfig.getUsername());
+                mqttConnectOptions.setPassword(mqttConnectionConfig.getPassword().toCharArray());
+            }
             mqttConnectOptions.setConnectionTimeout(mqttConnectionConfig.getConnectionTimeout());
             mqttConnectOptions.setKeepAliveInterval(mqttConnectionConfig.getKeepAliveInterval());
             mqttConnectOptions.setCleanSession(true);
             mqttConnectOptions.setAutomaticReconnect(true);
             this.mqttClient.connect(mqttConnectOptions);
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-            e.printStackTrace();
+            throw new MqttClientException("Failed to connect to broker ReasonCode is:" + e.getReasonCode());
         }
     }
     
@@ -64,19 +70,21 @@ public class PahoMqttClient extends MqttClient {
     }
     
     @Override
-    public void subscribe(String topic) {
+    public void subscribe(String topic, MqttMsgListener mqttMsgListener) {
         try {
-            this.mqttClient.subscribe(topic);
+            IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, new MqttMsg(message));
+            this.mqttClient.subscribe(topic, iMqttMessageListener);
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             e.printStackTrace();
         }
     }
     
     @Override
-    public void subscribe(String[] topics) {
+    public void subscribe(String[] topics, MqttMsgListener mqttMsgListener) {
+        IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, new MqttMsg(message));
         for (String t : topics) {
             try {
-                this.mqttClient.subscribe(t);
+                this.mqttClient.subscribe(t, iMqttMessageListener);
             } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
                 e.printStackTrace();
             }
@@ -111,4 +119,6 @@ public class PahoMqttClient extends MqttClient {
             e.printStackTrace();
         }
     }
+
+
 }
