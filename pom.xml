@@ -11,6 +11,8 @@
     <url>http://maven.apache.org</url>
     <modules>
         <module>Iris-common</module>
+        <module>Iris-server</module>
+        <module>Iris-client</module>
     </modules>
 
     <properties>

@@ -59,10 +59,10 @@ public class PahoMqttClient extends MqttClient {
     }
     
     @Override
-    public void publish(String[] topic, int qos) throws MqttClientException {
+    public void publish(String[] topic, String message, int qos) throws MqttClientException {
         for (String t : topic) {
             try {
-                this.mqttClient.publish(t, new byte[0], qos, false);
+                this.mqttClient.publish(t, message.getBytes(), qos, false);
             } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
                 throw new MqttClientException(e.getMessage());
             }
@@ -119,6 +119,4 @@ public class PahoMqttClient extends MqttClient {
             e.printStackTrace();
         }
     }
-
-
 }
