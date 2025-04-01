@@ -1,7 +1,9 @@
 package io.github.qylh.common.mqtt;
 
+import lombok.Builder;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+@Builder
 public class MqttMsg {
     private boolean mutable = true;
     private byte[] payload;

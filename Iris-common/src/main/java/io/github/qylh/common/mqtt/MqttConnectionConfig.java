@@ -18,9 +18,11 @@
  */
 package io.github.qylh.common.mqtt;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class MqttConnectionConfig {
     
     private String broker;

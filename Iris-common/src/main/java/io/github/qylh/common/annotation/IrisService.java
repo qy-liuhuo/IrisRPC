@@ -1,4 +1,4 @@
-package io.github.qylh.server;
+package io.github.qylh.common.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

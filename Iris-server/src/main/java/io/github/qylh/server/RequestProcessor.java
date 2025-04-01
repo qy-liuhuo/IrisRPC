@@ -1,5 +1,7 @@
 package io.github.qylh.server;
 
+import io.github.qylh.common.annotation.Api;
+import io.github.qylh.common.annotation.IrisService;
 import io.github.qylh.common.constant.Constants;
 import io.github.qylh.common.mqtt.*;
 import io.github.qylh.common.mqtt.client.MqttClient;
@@ -9,14 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RequestInvoker {
+public class RequestProcessor {
 
-    Logger Log = LoggerFactory.getLogger(RequestInvoker.class);
+    private static final Logger Log = LoggerFactory.getLogger(RequestProcessor.class);
 
     private Map<String, Method> apis = new HashMap<>();
 
