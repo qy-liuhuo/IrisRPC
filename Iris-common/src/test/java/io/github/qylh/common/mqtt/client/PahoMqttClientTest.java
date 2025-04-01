@@ -15,16 +15,17 @@ import java.util.List;
 
 public class PahoMqttClientTest extends MQTTContainerTestEnv {
 
-    private MqttConnectionConfig mqttConnectionConfig = new MqttConnectionConfig();
+    private MqttConnectionConfig mqttConnectionConfig;
 
     private MqttClient pahoMqttClient;
 
     @Before
     public void beforeRun(){
-        mqttConnectionConfig.setBroker("tcp://" + mqttBrokerContainer.getHost() + ":" + mqttBrokerContainer.getMappedPort(1883));
-        mqttConnectionConfig.setConnectionTimeout(10);
-        mqttConnectionConfig.setKeepAliveInterval(60);
-        mqttConnectionConfig.setClientId("PahoMqttClientTest");
+        mqttConnectionConfig = MqttConnectionConfig.builder()
+                        .broker("tcp://" + mqttBrokerContainer.getHost() + ":" + mqttBrokerContainer.getMappedPort(1883))
+                        .connectionTimeout(10)
+                        .keepAliveInterval(60)
+                        .clientId("PahoMqttClientTest").build();
         pahoMqttClient = new PahoMqttClient();
         try{
             pahoMqttClient.connect(mqttConnectionConfig);
