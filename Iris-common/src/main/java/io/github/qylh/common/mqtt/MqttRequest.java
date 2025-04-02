@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class MqttRequest {
+public class MqttRequest extends RPCMsg{
 
     private String serviceName;
 
@@ -17,7 +17,7 @@ public class MqttRequest {
 
     private Class<?>[] argsType;
 
-    private String clientId;
+    private Integer requestId;
 
     public String getTopic(){
         return Constants.MQTT_REQUEST_TOPIC_SUFFIX + serviceName + "/" + methodName;
@@ -26,5 +26,4 @@ public class MqttRequest {
     public MqttRequest(MqttMsg msg){
         JsonSerializer.deserialize(msg.toString(), MqttRequest.class);
     }
-
 }

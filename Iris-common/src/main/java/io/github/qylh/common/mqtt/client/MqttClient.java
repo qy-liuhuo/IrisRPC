@@ -20,13 +20,14 @@ package io.github.qylh.common.mqtt.client;
 
 import io.github.qylh.common.mqtt.MqttClientException;
 import io.github.qylh.common.mqtt.MqttConnectionConfig;
+import io.github.qylh.common.mqtt.MqttMsg;
 import io.github.qylh.common.mqtt.MqttMsgListener;
 
 public abstract class MqttClient {
     
     public abstract void connect(MqttConnectionConfig mqttConnectionConfig) throws MqttClientException;
-    public abstract void publish(String topic, String message, int qos) throws MqttClientException;
-    public abstract void publish(String[] topic,String message, int qos) throws MqttClientException;
+    public abstract void publish(String topic, MqttMsg mqttMsg) throws MqttClientException;
+    public abstract void publish(String[] topic, MqttMsg mqttMsg) throws MqttClientException;
     public abstract void subscribe(String topic, MqttMsgListener mqttMsgListener);
     public abstract void subscribe(String[] topics, MqttMsgListener mqttMsgListener);
     public abstract void unsubscribe(String topic);

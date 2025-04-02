@@ -6,7 +6,6 @@ import io.github.qylh.common.constant.Constants;
 import io.github.qylh.common.mqtt.*;
 import io.github.qylh.common.mqtt.client.MqttClient;
 import io.github.qylh.common.mqtt.client.PahoMqttClient;
-import io.github.qylh.common.serializer.JsonSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,22 +59,20 @@ public class RequestProcessor {
                             apis.put(fullName, method);
                             mqttClient.subscribe(fullName, (topic, message) -> {
                                 MqttResponse mqttResponse = new MqttResponse();
-                                mqttResponse.setClientId(clientId);
+                                MqttRequest mqttRequest = (MqttRequest) message.getRPCMsg();
+                                Object[] args = mqttRequest.getArgs();
                                 try {
-                                    MqttRequest mqttRequest = new MqttRequest(message);
-                                    Object res = method.invoke(serviceObjects.get(serviceName), mqttRequest.getArgs().toArray());
+                                    Object res = method.invoke(serviceObjects.get(serviceName), args);
                                     mqttResponse.setCode(Constants.IRIS_MQTT_SUCCESS);
-                                    mqttResponse.setMsg(JsonSerializer.serialize(res));
+                                    mqttResponse.setData(res);
                                 } catch (Exception e) {
                                     Log.error("Failed to invoke method :" + fullName);
                                     mqttResponse.setCode(Constants.IRIS_MQTT_INVOKE_ERROR);
                                     mqttResponse.setMsg("Failed to invoke method :" + fullName);
                                 }finally {
                                     try {
-                                        MqttMsg mqttMsg = new MqttMsg();
-                                        mqttMsg.setPayload(JsonSerializer.serialize(mqttResponse).getBytes());
-                                        mqttMsg.setQos(Constants.QOS);
-                                        mqttClient.publish(Constants.MQTT_RESPONSE_TOPIC_SUFFIX + message.getId(), JsonSerializer.serialize(mqttMsg) , Constants.QOS);
+                                        MqttMsg mqttMsg = new MqttMsg(mqttResponse);
+                                        mqttClient.publish(Constants.MQTT_RESPONSE_TOPIC_SUFFIX + clientId, mqttMsg);
                                     }catch (MqttClientException e){
                                         Log.error("Failed to publish response" + e.getMessage());
                                     }

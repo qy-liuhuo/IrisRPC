@@ -1,16 +1,24 @@
 package io.github.qylh.common.mqtt;
 
-import lombok.Builder;
+import io.github.qylh.common.constant.Constants;
+import io.github.qylh.common.serializer.JsonSerializer;
+import lombok.Data;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-@Builder
+import java.io.UnsupportedEncodingException;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
+
+@Data
 public class MqttMsg {
-    private boolean mutable = true;
-    private byte[] payload;
-    private int qos = 1;
-    private boolean retained = false;
-    private boolean dup = false;
-    private int messageId;
+
+    private static final AtomicInteger MSG_ID_GENERATOR = new AtomicInteger(ThreadLocalRandom.current().nextInt());
+
+    private RPCMsg RPCMsg;
+
+    private int qos = Constants.QOS;
+
+    private Integer messageId;
 
     public static void validateQos(int qos) {
         if (qos < 0 || qos > 2) {
@@ -18,96 +26,31 @@ public class MqttMsg {
         }
     }
 
-    public MqttMsg(MqttMessage mqttMessage){
-        this.setDuplicate(mqttMessage.isDuplicate());
-        this.setPayload(mqttMessage.getPayload());
-        this.setQos(mqttMessage.getQos());
-        this.setRetained(mqttMessage.isRetained());
-        this.setId(mqttMessage.getId());
-        this.setMutable(false);
+    public MqttMsg(){
+        this.messageId = MSG_ID_GENERATOR.incrementAndGet();
     }
 
-    public MqttMsg() {
-        this.setPayload(new byte[0]);
+    public MqttMsg(MqttRequest mqttRequest){
+        this.messageId = MSG_ID_GENERATOR.incrementAndGet();
+        mqttRequest.setRequestId(this.messageId);
+        this.RPCMsg = mqttRequest;
     }
 
-    public MqttMsg(byte[] payload) {
-        this.setPayload(payload);
+    public MqttMsg(MqttResponse mqttResponse){
+        this.messageId = MSG_ID_GENERATOR.incrementAndGet();
+        this.RPCMsg = mqttResponse;
     }
 
-    public byte[] getPayload() {
-        return this.payload;
+    public static MqttMsg fromPahoMqttMessage(MqttMessage mqttMessage) throws UnsupportedEncodingException {
+        return JsonSerializer.deserialize(new String(mqttMessage.getPayload(), Constants.MQTT_CHARSET_NAME), MqttMsg.class);
     }
 
-    public void clearPayload() {
-        this.checkMutable();
-        this.payload = new byte[0];
-    }
-
-    public void setPayload(byte[] payload) {
-        this.checkMutable();
-        if (payload == null) {
-            throw new NullPointerException();
-        } else {
-            this.payload = (byte[])payload.clone();
-        }
-    }
-
-    public boolean isRetained() {
-        return this.retained;
-    }
-
-    public void setRetained(boolean retained) {
-        this.checkMutable();
-        this.retained = retained;
-    }
-
-    public int getQos() {
-        return this.qos;
-    }
-
-    public void setQos(int qos) {
-        this.checkMutable();
-        validateQos(qos);
-        this.qos = qos;
-    }
-
-    public String toString() {
-        return new String(this.payload);
-    }
-
-    protected void setMutable(boolean mutable) {
-        this.mutable = mutable;
-    }
-
-    protected void checkMutable() throws IllegalStateException {
-        if (!this.mutable) {
-            throw new IllegalStateException();
-        }
-    }
-
-    protected void setDuplicate(boolean dup) {
-        this.dup = dup;
-    }
-
-    public boolean isDuplicate() {
-        return this.dup;
-    }
-
-    public void setId(int messageId) {
-        this.messageId = messageId;
-    }
-
-    public int getId() {
-        return this.messageId;
-    }
-
-    public String toString(String charset) {
-        try {
-            return new String(this.payload, charset);
-        } catch (Exception e) {
-            return new String(this.payload);
-        }
+    public MqttMessage toPahoMqttMessage(){
+        MqttMessage mqttMessage = new MqttMessage();
+        mqttMessage.setPayload(JsonSerializer.serialize(this).getBytes());
+        mqttMessage.setQos(this.qos);
+        mqttMessage.setId(this.messageId);
+        return mqttMessage;
     }
 
 }

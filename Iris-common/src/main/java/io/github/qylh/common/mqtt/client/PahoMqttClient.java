@@ -18,12 +18,10 @@
  */
 package io.github.qylh.common.mqtt.client;
 
-import io.github.qylh.common.mqtt.MqttClientException;
-import io.github.qylh.common.mqtt.MqttConnectionConfig;
-import io.github.qylh.common.mqtt.MqttMsg;
-import io.github.qylh.common.mqtt.MqttMsgListener;
+import io.github.qylh.common.mqtt.*;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 public class PahoMqttClient extends MqttClient {
     
@@ -50,19 +48,19 @@ public class PahoMqttClient extends MqttClient {
     }
     
     @Override
-    public void publish(String topic, String message, int qos) throws MqttClientException {
+    public void publish(String topic, MqttMsg message) throws MqttClientException {
         try {
-            this.mqttClient.publish(topic, message.getBytes(), qos, false);
+            this.mqttClient.publish(topic, message.toPahoMqttMessage());
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             throw new MqttClientException(e.getMessage());
         }
     }
     
     @Override
-    public void publish(String[] topic, String message, int qos) throws MqttClientException {
-        for (String t : topic) {
+    public void publish(String[] topics, MqttMsg message) throws MqttClientException {
+        for (String topic : topics) {
             try {
-                this.mqttClient.publish(t, message.getBytes(), qos, false);
+                this.mqttClient.publish(topic, message.toPahoMqttMessage());
             } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
                 throw new MqttClientException(e.getMessage());
             }
@@ -72,7 +70,7 @@ public class PahoMqttClient extends MqttClient {
     @Override
     public void subscribe(String topic, MqttMsgListener mqttMsgListener) {
         try {
-            IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, new MqttMsg(message));
+            IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, MqttMsg.fromPahoMqttMessage((MqttMessage) message));
             this.mqttClient.subscribe(topic, iMqttMessageListener);
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             e.printStackTrace();
@@ -81,7 +79,7 @@ public class PahoMqttClient extends MqttClient {
     
     @Override
     public void subscribe(String[] topics, MqttMsgListener mqttMsgListener) {
-        IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, new MqttMsg(message));
+        IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, MqttMsg.fromPahoMqttMessage((MqttMessage) message));
         for (String t : topics) {
             try {
                 this.mqttClient.subscribe(t, iMqttMessageListener);
