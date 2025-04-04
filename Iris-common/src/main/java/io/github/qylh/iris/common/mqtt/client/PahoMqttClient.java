@@ -26,8 +26,10 @@ import io.github.qylh.iris.common.mqtt.msg.MqttMsg;
 import io.github.qylh.iris.common.mqtt.msg.MqttRequest;
 import io.github.qylh.iris.common.mqtt.msg.MqttResponse;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
+import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class PahoMqttClient extends MqttClient {
     
@@ -37,22 +39,28 @@ public class PahoMqttClient extends MqttClient {
     @Override
     public void connect(MqttConnectionConfig mqttConnectionConfig) throws MqttClientException {
         try {
-            this.mqttClient = new org.eclipse.paho.client.mqttv3.MqttClient(mqttConnectionConfig.getBroker(), mqttConnectionConfig.getClientId());
-            MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
-            if (mqttConnectionConfig.getUsername() != null && mqttConnectionConfig.getPassword() != null) {
-                mqttConnectOptions.setUserName(mqttConnectionConfig.getUsername());
-                mqttConnectOptions.setPassword(mqttConnectionConfig.getPassword().toCharArray());
-            }
-            mqttConnectOptions.setConnectionTimeout(mqttConnectionConfig.getConnectionTimeout());
-            mqttConnectOptions.setKeepAliveInterval(mqttConnectionConfig.getKeepAliveInterval());
-            mqttConnectOptions.setCleanSession(true);
-            mqttConnectOptions.setAutomaticReconnect(true);
+            MqttClientPersistence mqttClientPersistence = new MemoryPersistence();
+            this.mqttClient = new org.eclipse.paho.client.mqttv3.MqttClient(mqttConnectionConfig.getBroker(), mqttConnectionConfig.getClientId(), mqttClientPersistence);
+            MqttConnectOptions mqttConnectOptions = getMqttConnectOptions(mqttConnectionConfig);
             this.mqttClient.connect(mqttConnectOptions);
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             throw new MqttClientException("Failed to connect to broker ReasonCode is:" + e.getReasonCode());
         }
     }
-    
+
+    private static MqttConnectOptions getMqttConnectOptions(MqttConnectionConfig mqttConnectionConfig) {
+        MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
+        if (mqttConnectionConfig.getUsername() != null && mqttConnectionConfig.getPassword() != null) {
+            mqttConnectOptions.setUserName(mqttConnectionConfig.getUsername());
+            mqttConnectOptions.setPassword(mqttConnectionConfig.getPassword().toCharArray());
+        }
+        mqttConnectOptions.setConnectionTimeout(mqttConnectionConfig.getConnectionTimeout());
+        mqttConnectOptions.setKeepAliveInterval(mqttConnectionConfig.getKeepAliveInterval());
+        mqttConnectOptions.setCleanSession(true);
+        mqttConnectOptions.setAutomaticReconnect(true);
+        return mqttConnectOptions;
+    }
+
     @Override
     public void publish(String topic, MqttMsg message) throws MqttClientException {
         message.setClientId(this.mqttClient.getClientId());
