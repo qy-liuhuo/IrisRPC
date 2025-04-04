@@ -10,9 +10,19 @@ import io.github.qylh.iris.common.mqtt.msg.MqttResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ThreadPoolExecutor;
+
 public class Requester {
     private static final Logger logger = LoggerFactory.getLogger(Requester.class);
     private final MqttClient mqttClient = new PahoMqttClient();
+
+    private static final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+            10,
+            20,
+            60,
+            java.util.concurrent.TimeUnit.SECONDS,
+            new java.util.concurrent.ArrayBlockingQueue<>(1000)
+    );
 
     private String clientId;
 
@@ -22,10 +32,12 @@ public class Requester {
             clientId = mqttConnectionConfig.getClientId();
             //TODO 线程池优化
             mqttClient.subscribe_response(Constants.MQTT_RESPONSE_TOPIC_SUFFIX + clientId, (topic, message) -> {
-                MqttResponse mqttResponse = (MqttResponse) message;
-                int responseId = mqttResponse.getResponseId();
-                RPCCall rpcCall = RPCCall.getRPCCall(responseId);
-                rpcCall.complete(mqttResponse);
+                threadPoolExecutor.submit(() -> {
+                    MqttResponse mqttResponse = (MqttResponse) message;
+                    int responseId = mqttResponse.getResponseId();
+                    RPCCall rpcCall = RPCCall.getRPCCall(responseId);
+                    rpcCall.complete(mqttResponse);
+                });
             });
         } catch (MqttClientException e) {
             logger.error("Failed to connect to broker ReasonCode is:" + e.getMessage());
