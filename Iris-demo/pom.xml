@@ -9,7 +9,8 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>Iris-client</artifactId>
+    <groupId>io.github.qylh.iris</groupId>
+    <artifactId>Iris-demo</artifactId>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -20,7 +21,13 @@
     <dependencies>
         <dependency>
             <groupId>io.github.qylh.iris</groupId>
-            <artifactId>Iris-common</artifactId>
+            <artifactId>Iris-server</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.qylh.iris</groupId>
+            <artifactId>Iris-client</artifactId>
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>

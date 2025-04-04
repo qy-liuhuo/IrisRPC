@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.qylh</groupId>
+    <groupId>io.github.qylh.iris</groupId>
     <artifactId>IrisRPC</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
@@ -13,6 +13,7 @@
         <module>Iris-common</module>
         <module>Iris-server</module>
         <module>Iris-client</module>
+        <module>Iris-demo</module>
     </modules>
 
     <properties>
@@ -63,7 +64,29 @@
     </build>
     <dependencyManagement>
         <dependencies>
+            <!-- SLF4J -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
 
+            <!-- Log4j2 -->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j2-impl</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
