@@ -30,7 +30,6 @@ public class Requester {
         try {
             mqttClient.connect(mqttConnectionConfig);
             clientId = mqttConnectionConfig.getClientId();
-            //TODO 线程池优化
             mqttClient.subscribe_response(Constants.MQTT_RESPONSE_TOPIC_SUFFIX + clientId, (topic, message) -> {
                 threadPoolExecutor.submit(() -> {
                     MqttResponse mqttResponse = (MqttResponse) message;
