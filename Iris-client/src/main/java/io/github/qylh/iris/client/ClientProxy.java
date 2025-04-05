@@ -1,8 +1,8 @@
 package io.github.qylh.iris.client;
 
-import io.github.qylh.iris.common.mqtt.MqttConnectionConfig;
-import io.github.qylh.iris.common.mqtt.msg.MqttRequest;
-import io.github.qylh.iris.common.mqtt.msg.MqttResponse;
+import io.github.qylh.iris.common.config.MqttConnectionConfig;
+import io.github.qylh.iris.common.msg.MqttRequest;
+import io.github.qylh.iris.common.msg.MqttResponse;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

@@ -1,7 +1,7 @@
 package io.github.qylh.iris.demo;
 
 import io.github.qylh.iris.client.ClientProxy;
-import io.github.qylh.iris.common.mqtt.MqttConnectionConfig;
+import io.github.qylh.iris.common.config.MqttConnectionConfig;
 
 public class IrisClient {
     public static void main(String[] args) {

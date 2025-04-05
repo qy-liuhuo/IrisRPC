@@ -1,7 +1,9 @@
-package io.github.qylh.iris.common.mqtt.msg;
+package io.github.qylh.iris.common.msg;
 
 import io.github.qylh.iris.common.constant.Constants;
 import io.github.qylh.iris.common.serializer.JsonSerializer;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -10,28 +12,32 @@ import java.io.UnsupportedEncodingException;
 
 @Getter
 @Setter
-public class MqttRequest extends MqttMsg{
+@Builder
+@AllArgsConstructor
+public class MqttResponse extends MqttMsg{
 
-    private String serviceName;
+    //响应码
+    private int code;
 
-    private String methodName;
+    //响应消息
+    private String msg;
 
-    private Object[] args;
+    //响应数据
+    private Object data;
 
-    private Class<?>[] argsType;
+    //响应id
+    private int ResponseId;
 
-    private int requestId;
+    public MqttResponse() {
 
-    public String getTopic(){
-        return Constants.MQTT_REQUEST_TOPIC_SUFFIX + serviceName + "/" + methodName;
     }
 
     public String toString() {
         return JsonSerializer.serialize(this);
     }
 
-    public static MqttRequest fromPahoMqttMessage(MqttMessage mqttMessage) throws UnsupportedEncodingException {
-        return JsonSerializer.deserialize(new String(mqttMessage.getPayload(), Constants.MQTT_CHARSET_NAME), MqttRequest.class);
+    public static MqttResponse fromPahoMqttMessage(MqttMessage mqttMessage) throws UnsupportedEncodingException {
+        return JsonSerializer.deserialize(new String(mqttMessage.getPayload(), Constants.MQTT_CHARSET_NAME), MqttResponse.class);
     }
 
     public MqttMessage toPahoMqttMessage(){
@@ -41,9 +47,4 @@ public class MqttRequest extends MqttMsg{
         mqttMessage.setId(this.getMessageId());
         return mqttMessage;
     }
-
-    public MqttRequest() {
-        this.requestId = this.getMessageId();
-    }
-
 }

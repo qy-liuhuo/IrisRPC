@@ -16,10 +16,13 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.common.mqtt.client;
+package io.github.qylh.iris.common.mqtt;
 
-import io.github.qylh.iris.common.mqtt.*;
-import io.github.qylh.iris.common.mqtt.msg.MqttMsg;
+import io.github.qylh.iris.common.config.MqttConnectionConfig;
+import io.github.qylh.iris.common.execption.MqttClientException;
+import io.github.qylh.iris.common.listener.MqttMsgListener;
+import io.github.qylh.iris.common.listener.PayLoadListener;
+import io.github.qylh.iris.common.msg.MqttMsg;
 
 public abstract class MqttClient {
     

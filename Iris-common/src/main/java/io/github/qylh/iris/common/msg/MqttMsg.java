@@ -1,4 +1,4 @@
-package io.github.qylh.iris.common.mqtt.msg;
+package io.github.qylh.iris.common.msg;
 
 import io.github.qylh.iris.common.constant.Constants;
 import lombok.Getter;

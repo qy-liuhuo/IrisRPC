@@ -16,15 +16,19 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.common.mqtt;
+package io.github.qylh.iris.common.config;
 
-public class MqttClientException extends Exception {
+import lombok.Builder;
+import lombok.Data;
+
+@Data
+@Builder
+public class MqttConnectionConfig {
     
-    public MqttClientException(String message) {
-        super(message);
-    }
-    
-    public MqttClientException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    private String broker;
+    private String username;
+    private String password;
+    private String clientId;
+    private int connectionTimeout;
+    private int keepAliveInterval;
 }
