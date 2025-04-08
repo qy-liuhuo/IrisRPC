@@ -39,6 +39,14 @@ public class RequestProcessor {
         register(serviceList);
     }
 
+    public void putService(String serviceName, Object serviceObject) {
+        if (serviceObjects.containsKey(serviceName)) {
+            throw new RuntimeException("duplicate service name");
+        } else {
+            serviceObjects.put(serviceName, serviceObject);
+        }
+    }
+
     private void register(List<Class<?>> serviceList){
         for (Class<?> service : serviceList) {
             if (service.isAnnotationPresent(IrisService.class)) {
@@ -46,7 +54,9 @@ public class RequestProcessor {
                 Method[] methods = service.getMethods();
                 //Todo 通过构造器构造对象（依赖问题？）
                 try{
-                    serviceObjects.put(serviceName, service.newInstance());
+                    if (!serviceObjects.containsKey(serviceName)) {
+                        serviceObjects.put(serviceName, service.newInstance());
+                    }
                 }catch (InstantiationException | IllegalAccessException e){
                     Log.error("Failed to create service object");
                     continue;
