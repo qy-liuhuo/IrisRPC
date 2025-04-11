@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Configuration
 @EnableConfigurationProperties(IrisProperties.class)
-public class IrisSpringBootStarterConfiguration  implements ApplicationContextAware {
+public class IrisSpringBootStarterConfiguration implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
 
