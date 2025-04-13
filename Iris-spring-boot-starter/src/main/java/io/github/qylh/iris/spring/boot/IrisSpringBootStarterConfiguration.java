@@ -43,6 +43,11 @@ public class IrisSpringBootStarterConfiguration implements ApplicationContextAwa
         return requestProcessor;
     }
 
+    @Bean
+    public  IrisReferenceBeanPostProcessor irisReferenceBeanPostProcessor(IrisProperties irisProperties) {
+        return new IrisReferenceBeanPostProcessor(irisProperties);
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
