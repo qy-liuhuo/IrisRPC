@@ -22,4 +22,8 @@ public class RPCCall extends CompletableFuture<MqttResponse> {
     public static RPCCall getRPCCall(int requestId){
         return calls.get(requestId);
     }
+
+    public static void removeRPCCall(int requestId){
+        calls.remove(requestId);
+    }
 }

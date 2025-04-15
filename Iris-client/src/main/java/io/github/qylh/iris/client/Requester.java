@@ -56,6 +56,8 @@ public class Requester {
         } catch (Exception e) {
             logger.error("Failed to get response ReasonCode is:" + e.getMessage());
             return null;
+        }finally {
+            RPCCall.removeRPCCall(request.getRequestId());
         }
     }
 
