@@ -14,6 +14,7 @@
         <module>Iris-server</module>
         <module>Iris-client</module>
         <module>Iris-demo</module>
+        <module>Iris-spring-boot-starter</module>
     </modules>
 
     <properties>

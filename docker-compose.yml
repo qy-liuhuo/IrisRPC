@@ -1,0 +1,10 @@
+version: '3.0'
+
+services:
+  emqx:
+    image: emqx/emqx:5.8.0
+    container_name: emqx
+#    restart: always
+    ports:
+      - "1883:1883"
+      - "18083:18083"
