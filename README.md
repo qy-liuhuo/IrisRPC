@@ -5,4 +5,20 @@
 
 # IrisRPC
 
-IrisRPC is an RPC framework based on MQTT
+IrisRPC is an RPC framework based on MQTT.
+
+In Greek mythology, Iris, the divine messenger of Zeus, traverses between Olympus and Earth via the Rainbow Bridge (Iris' Path) to deliver divine commands. Her role perfectly mirrors the framework's core characteristics:
+
+● Sky-to-Earth Connection
+The Rainbow Bridge links gods and mortals → Symbolizes the framework's ability to seamlessly connect devices, services, and cloud across network boundaries.
+
+● Lightweight & Agile
+Iris travels at light speed → Reflects MQTT's low-bandwidth consumption and ultra-low latency transmission, ideal for IoT scenarios.
+
+● Reliable Delivery
+As Zeus' exclusive messenger, Iris guarantees message accuracy → Embodies MQTT's QoS mechanisms (message reliability) and RPC's request-response integrity.
+
+● Polyglot Compatibility
+The seven-color spectrum of the rainbow → Represents multi-language support (Python/Java/C++/etc.), enabling interoperability across heterogeneous systems.
+
+This version maintains the poetic metaphor while explicitly connecting mythological elements to technical specifications. Let me know if you need adjustments to specific terminology! 🌈
