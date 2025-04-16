@@ -20,5 +20,3 @@ As Zeus' exclusive messenger, Iris guarantees message accuracy → Embodies MQTT
 
 ● Polyglot Compatibility
 The seven-color spectrum of the rainbow → Represents multi-language support (Python/Java/C++/etc.), enabling interoperability across heterogeneous systems.
-
-This version maintains the poetic metaphor while explicitly connecting mythological elements to technical specifications. Let me know if you need adjustments to specific terminology! 🌈
