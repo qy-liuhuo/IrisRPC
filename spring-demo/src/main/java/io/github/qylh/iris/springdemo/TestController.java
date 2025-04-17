@@ -13,7 +13,7 @@ public class TestController{
 
     @GetMapping("/test")
     public String test() {
-        return testService.test(1);
+        return testService.toString();
     }
 
 }

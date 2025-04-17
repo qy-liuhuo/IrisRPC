@@ -10,18 +10,19 @@ import java.lang.reflect.Proxy;
 
 public class ClientProxy implements InvocationHandler {
 
-    private static Requester requestInvoker;
+    private final Requester requestInvoker;
 
+    private final Class<?> serviceClazz;
 
-    public ClientProxy(MqttConnectionConfig config) {
-        requestInvoker = new Requester();
-        requestInvoker.init(config);
+    public ClientProxy(Requester requestInvoker, Class<?> serviceClazz){
+        this.requestInvoker = requestInvoker;
+        this.serviceClazz = serviceClazz;
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         MqttRequest request = new MqttRequest();
-        request.setServiceName(method.getDeclaringClass().getSimpleName());
+        request.setServiceName(this.serviceClazz.getSimpleName());
         request.setMethodName(method.getName());
         request.setArgs(args);
         request.setArgsType(method.getParameterTypes());
@@ -32,8 +33,8 @@ public class ClientProxy implements InvocationHandler {
         return response.getData();
     }
 
-    public <T>T getProxy(Class<T> clazz){
-        Object o = Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, this);
+    public <T>T getProxy(){
+        Object o = Proxy.newProxyInstance(serviceClazz.getClassLoader(), new Class[]{serviceClazz}, this);
         return (T) o;
     }
 }
