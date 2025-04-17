@@ -16,27 +16,24 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.spring.boot;
+package io.github.qylh.iris.core.common.constant;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
-@Data
-@ConfigurationProperties(prefix = "iris")
-public class IrisProperties {
+public class Constants {
     
-    private String broker;
+    public static final String MQTT_REQUEST_TOPIC_SUFFIX = "iris/request/";
     
-    private String username;
+    public static final String MQTT_RESPONSE_TOPIC_SUFFIX = "iris/response/";
     
-    private String password;
+    public static final String MQTT_CHARSET_NAME = "UTF-8";
     
-    private String clientId;
+    public static final int IRIS_MQTT_SUCCESS = 0;
     
-    private int connectionTimeout;
+    public static final int IRIS_MQTT_SERVICE_NOT_FOUND = 1;
     
-    private int keepAliveInterval;
+    public static final int IRIS_MQTT_METHOD_NOT_FOUND = 2;
     
-    private int timeout = 10;
+    public static final int IRIS_MQTT_INVOKE_ERROR = 3;
+    
+    public static final int QOS = 1;
     
 }

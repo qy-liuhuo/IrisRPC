@@ -16,27 +16,14 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.spring.boot;
+package io.github.qylh.iris.core.common.annotation;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@Data
-@ConfigurationProperties(prefix = "iris")
-public class IrisProperties {
-    
-    private String broker;
-    
-    private String username;
-    
-    private String password;
-    
-    private String clientId;
-    
-    private int connectionTimeout;
-    
-    private int keepAliveInterval;
-    
-    private int timeout = 10;
-    
+@Target({ElementType.FIELD, ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface IrisRPC {
 }

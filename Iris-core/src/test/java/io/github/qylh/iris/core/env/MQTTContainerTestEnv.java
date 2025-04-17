@@ -16,27 +16,28 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.spring.boot;
+package io.github.qylh.iris.core.env;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.BeforeClass;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.lifecycle.Startables;
 
-@Data
-@ConfigurationProperties(prefix = "iris")
-public class IrisProperties {
+import java.util.stream.Stream;
+
+public class MQTTContainerTestEnv {
     
-    private String broker;
+    static final Logger logger = LogManager.getLogger(MQTTContainerTestEnv.class);
     
-    private String username;
+    public static final GenericContainer mqttBrokerContainer = new GenericContainer("emqx/emqx:5.8.6")
+            .withExposedPorts(1883, 18083);
     
-    private String password;
-    
-    private String clientId;
-    
-    private int connectionTimeout;
-    
-    private int keepAliveInterval;
-    
-    private int timeout = 10;
+    @BeforeClass
+    public static void before() {
+        logger.info("Starting containers...");
+        Startables.deepStart(Stream.of(mqttBrokerContainer)).join();
+        logger.info("Containers are started.");
+    }
     
 }

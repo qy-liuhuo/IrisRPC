@@ -16,27 +16,23 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.spring.boot;
+package io.github.qylh.iris.example.clientspring;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import io.github.qylh.iris.core.common.annotation.IrisRPC;
+import io.github.qylh.iris.example.common.TestService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Data
-@ConfigurationProperties(prefix = "iris")
-public class IrisProperties {
+@RestController
+public class TestController {
     
-    private String broker;
+    @IrisRPC
+    private TestService testService;
     
-    private String username;
-    
-    private String password;
-    
-    private String clientId;
-    
-    private int connectionTimeout;
-    
-    private int keepAliveInterval;
-    
-    private int timeout = 10;
+    @GetMapping("/test")
+    public String test() {
+        System.out.println("12345");
+        return testService.toString();
+    }
     
 }

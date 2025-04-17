@@ -16,27 +16,9 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.spring.boot;
+package io.github.qylh.iris.core.listener;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
-@Data
-@ConfigurationProperties(prefix = "iris")
-public class IrisProperties {
+public interface PayLoadListener {
     
-    private String broker;
-    
-    private String username;
-    
-    private String password;
-    
-    private String clientId;
-    
-    private int connectionTimeout;
-    
-    private int keepAliveInterval;
-    
-    private int timeout = 10;
-    
+    void onMessage(String topic, String message);
 }

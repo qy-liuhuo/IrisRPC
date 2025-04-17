@@ -16,27 +16,16 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.spring.boot;
+package io.github.qylh.iris.example.clientspring;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@Data
-@ConfigurationProperties(prefix = "iris")
-public class IrisProperties {
+@SpringBootApplication
+public class ExampleClientSpringApplication {
     
-    private String broker;
-    
-    private String username;
-    
-    private String password;
-    
-    private String clientId;
-    
-    private int connectionTimeout;
-    
-    private int keepAliveInterval;
-    
-    private int timeout = 10;
+    public static void main(String[] args) {
+        SpringApplication.run(ExampleClientSpringApplication.class, args);
+    }
     
 }

@@ -16,27 +16,15 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.spring.boot;
+package io.github.qylh.iris.core.common.execption;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
-@Data
-@ConfigurationProperties(prefix = "iris")
-public class IrisProperties {
+public class MqttClientException extends Exception {
     
-    private String broker;
+    public MqttClientException(String message) {
+        super(message);
+    }
     
-    private String username;
-    
-    private String password;
-    
-    private String clientId;
-    
-    private int connectionTimeout;
-    
-    private int keepAliveInterval;
-    
-    private int timeout = 10;
-    
+    public MqttClientException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

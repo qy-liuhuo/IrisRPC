@@ -16,27 +16,19 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.spring.boot;
+package io.github.qylh.iris.core.common.serializer;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import com.fasterxml.jackson.core.type.TypeReference;
 
-@Data
-@ConfigurationProperties(prefix = "iris")
-public class IrisProperties {
+import java.util.List;
+
+public interface JsonSerializerFacade {
     
-    private String broker;
+    <T> T deserialize(String text, Class<T> clazz);
     
-    private String username;
+    <T> T deserialize(String text, TypeReference<T> valueTypeRef);
     
-    private String password;
+    <T> List<T> deserializeArray(String text, Class<T> clazz);
     
-    private String clientId;
-    
-    private int connectionTimeout;
-    
-    private int keepAliveInterval;
-    
-    private int timeout = 10;
-    
+    String serialize(Object abj);
 }

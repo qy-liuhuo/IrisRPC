@@ -16,27 +16,20 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.spring.boot;
+package io.github.qylh.iris.example.serverspring;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import io.github.qylh.iris.core.common.annotation.Api;
+import io.github.qylh.iris.core.common.annotation.IrisService;
+import io.github.qylh.iris.example.common.TestService;
+import org.springframework.stereotype.Service;
 
-@Data
-@ConfigurationProperties(prefix = "iris")
-public class IrisProperties {
+@IrisService(name = "TestService")
+@Service
+public class TestServiceImpl implements TestService {
     
-    private String broker;
-    
-    private String username;
-    
-    private String password;
-    
-    private String clientId;
-    
-    private int connectionTimeout;
-    
-    private int keepAliveInterval;
-    
-    private int timeout = 10;
-    
+    @Override
+    @Api(name = "test")
+    public String test(Integer a) {
+        return "Hello, this is a test message from TestServiceImpl!" + a;
+    }
 }

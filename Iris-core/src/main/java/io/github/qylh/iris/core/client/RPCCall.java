@@ -16,27 +16,33 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.spring.boot;
+package io.github.qylh.iris.core.client;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import io.github.qylh.iris.core.common.msg.MqttResponse;
 
-@Data
-@ConfigurationProperties(prefix = "iris")
-public class IrisProperties {
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class RPCCall extends CompletableFuture<MqttResponse> {
     
-    private String broker;
+    private final int requestId;
     
-    private String username;
+    private static ConcurrentHashMap<Integer, RPCCall> calls = new ConcurrentHashMap<>();
     
-    private String password;
+    private RPCCall(int requestId) {
+        this.requestId = requestId;
+        calls.put(requestId, this);
+    }
     
-    private String clientId;
+    public static RPCCall makeRPCCall(int requestId) {
+        return new RPCCall(requestId);
+    }
     
-    private int connectionTimeout;
+    public static RPCCall getRPCCall(int requestId) {
+        return calls.get(requestId);
+    }
     
-    private int keepAliveInterval;
-    
-    private int timeout = 10;
-    
+    public static void removeRPCCall(int requestId) {
+        calls.remove(requestId);
+    }
 }

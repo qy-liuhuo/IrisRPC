@@ -16,27 +16,20 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.spring.boot;
+package io.github.qylh.iris.core.client;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import io.github.qylh.iris.core.config.IrisConfig;
 
-@Data
-@ConfigurationProperties(prefix = "iris")
-public class IrisProperties {
+public class ClientProxyFactory {
     
-    private String broker;
+    private final Requester requestInvoker;
     
-    private String username;
+    public ClientProxyFactory(IrisConfig config) {
+        this.requestInvoker = new Requester(config);
+        this.requestInvoker.start();
+    }
     
-    private String password;
-    
-    private String clientId;
-    
-    private int connectionTimeout;
-    
-    private int keepAliveInterval;
-    
-    private int timeout = 10;
-    
+    public <T> T getProxy(Class<?> serviceClazz) {
+        return new ClientProxy(this.requestInvoker, serviceClazz).getProxy();
+    }
 }

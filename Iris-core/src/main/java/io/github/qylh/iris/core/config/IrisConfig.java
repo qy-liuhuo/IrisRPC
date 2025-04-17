@@ -16,27 +16,21 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.spring.boot;
+package io.github.qylh.iris.core.config;
 
+import lombok.Builder;
 import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import java.util.concurrent.TimeUnit;
 
 @Data
-@ConfigurationProperties(prefix = "iris")
-public class IrisProperties {
+@Builder
+public class IrisConfig {
     
-    private String broker;
+    private MqttConnectionConfig mqttConnectionConfig;
     
-    private String username;
+    private long timeout;
     
-    private String password;
-    
-    private String clientId;
-    
-    private int connectionTimeout;
-    
-    private int keepAliveInterval;
-    
-    private int timeout = 10;
+    private TimeUnit timeoutUnit = TimeUnit.SECONDS;
     
 }
