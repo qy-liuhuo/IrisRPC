@@ -1,7 +1,7 @@
 package io.github.qylh.iris.demo;
 
-import io.github.qylh.iris.client.ClientProxy;
 import io.github.qylh.iris.client.ClientProxyFactory;
+import io.github.qylh.iris.common.config.IrisConfig;
 import io.github.qylh.iris.common.config.MqttConnectionConfig;
 
 public class IrisClient {
@@ -12,7 +12,11 @@ public class IrisClient {
                 .keepAliveInterval(60)
                 .clientId("IrisClient")
                 .build();
-        ClientProxyFactory clientProxyFactory = new ClientProxyFactory(mqttConnectionConfig);
+        IrisConfig config = IrisConfig.builder()
+                .mqttConnectionConfig(mqttConnectionConfig)
+                .timeout(10)
+                .build();
+        ClientProxyFactory clientProxyFactory = new ClientProxyFactory(config);
         TestService testService = clientProxyFactory.getProxy(TestService.class);
         String result = testService.test(10);
         System.out.println(result);
