@@ -1,0 +1,20 @@
+name: Iris-Code-Style-Check
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Iris-Code-Style-Check
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 11
+          distribution: temurin
+      - name: Spotless Check
+        run: mvn spotless:check
+          
