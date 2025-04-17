@@ -20,4 +20,6 @@ public class IrisProperties {
 
     private int keepAliveInterval;
 
+    private int timeout = 10;
+
 }

@@ -2,6 +2,7 @@ package io.github.qylh.iris.spring.boot;
 
 import io.github.qylh.iris.client.ClientProxyFactory;
 import io.github.qylh.iris.common.annotation.IrisRPC;
+import io.github.qylh.iris.common.config.IrisConfig;
 import io.github.qylh.iris.common.config.MqttConnectionConfig;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.util.ReflectionUtils;
@@ -19,7 +20,11 @@ public class IrisReferenceBeanPostProcessor implements BeanPostProcessor {
                 .connectionTimeout(irisProperties.getConnectionTimeout())
                 .keepAliveInterval(irisProperties.getKeepAliveInterval())
                 .build();
-        this.clientProxyFactory = new ClientProxyFactory(mqttConnectionConfig);
+        IrisConfig irisConfig = IrisConfig.builder()
+                .mqttConnectionConfig(mqttConnectionConfig)
+                .timeout(irisProperties.getTimeout())
+                .build();
+        this.clientProxyFactory = new ClientProxyFactory(irisConfig);
     }
 
     @Override

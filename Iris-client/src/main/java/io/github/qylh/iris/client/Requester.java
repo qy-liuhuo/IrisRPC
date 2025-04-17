@@ -1,8 +1,8 @@
 package io.github.qylh.iris.client;
 
+import io.github.qylh.iris.common.config.IrisConfig;
 import io.github.qylh.iris.common.constant.Constants;
 import io.github.qylh.iris.common.execption.MqttClientException;
-import io.github.qylh.iris.common.config.MqttConnectionConfig;
 import io.github.qylh.iris.common.mqtt.MqttClient;
 import io.github.qylh.iris.common.mqtt.PahoMqttClient;
 import io.github.qylh.iris.common.msg.MqttRequest;
@@ -16,6 +16,8 @@ public class Requester {
     private static final Logger logger = LoggerFactory.getLogger(Requester.class);
     private final MqttClient mqttClient = new PahoMqttClient();
 
+    private final IrisConfig config;
+
     private static final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
             10,
             20,
@@ -26,10 +28,14 @@ public class Requester {
 
     private String clientId;
 
-    public void init(MqttConnectionConfig mqttConnectionConfig){
+    public Requester(IrisConfig config) {
+        this.config = config;
+    }
+
+    public void start(){
         try {
-            mqttClient.connect(mqttConnectionConfig);
-            clientId = mqttConnectionConfig.getClientId();
+            mqttClient.connect(config.getMqttConnectionConfig());
+            clientId = config.getMqttConnectionConfig().getClientId();
             mqttClient.subscribe_response(Constants.MQTT_RESPONSE_TOPIC_SUFFIX + clientId, (topic, message) -> {
                 threadPoolExecutor.submit(() -> {
                     MqttResponse mqttResponse = (MqttResponse) message;
