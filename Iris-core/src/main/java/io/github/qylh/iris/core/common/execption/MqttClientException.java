@@ -16,11 +16,15 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.core.listener;
+package io.github.qylh.iris.core.common.execption;
 
-import io.github.qylh.iris.core.common.msg.MqttMsg;
-
-public interface MqttMsgListener {
+public class MqttClientException extends Exception {
     
-    void onMessage(String topic, MqttMsg message);
+    public MqttClientException(String message) {
+        super(message);
+    }
+    
+    public MqttClientException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

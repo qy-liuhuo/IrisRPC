@@ -21,7 +21,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
         <irisRPC.root.dir>${project.basedir}</irisRPC.root.dir>
-        <spotless.version>2.27.2</spotless.version>
+        <spotless.version>2.43.0</spotless.version>
         <paho.version>1.2.5</paho.version>
         <jackson.version>2.18.2</jackson.version>
         <testcontainers.version>1.20.6</testcontainers.version>

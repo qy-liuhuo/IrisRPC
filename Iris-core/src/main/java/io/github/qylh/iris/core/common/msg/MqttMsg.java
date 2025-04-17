@@ -16,27 +16,37 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.spring.boot;
+package io.github.qylh.iris.core.common.msg;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import io.github.qylh.iris.core.common.constant.Constants;
+import lombok.Getter;
+import lombok.Setter;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-@Data
-@ConfigurationProperties(prefix = "iris")
-public class IrisProperties {
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
+
+@Getter
+@Setter
+public class MqttMsg {
     
-    private String broker;
+    private static final AtomicInteger MSG_ID_GENERATOR = new AtomicInteger(ThreadLocalRandom.current().nextInt());
     
-    private String username;
+    private int qos = Constants.QOS;
     
-    private String password;
+    private Integer messageId;
     
     private String clientId;
     
-    private int connectionTimeout;
+    public MqttMsg() {
+        this.messageId = MSG_ID_GENERATOR.incrementAndGet();
+    }
     
-    private int keepAliveInterval;
-    
-    private int timeout = 10;
+    public MqttMessage toPahoMqttMessage() {
+        MqttMessage mqttMessage = new MqttMessage();
+        mqttMessage.setQos(this.getQos());
+        mqttMessage.setId(this.getMessageId());
+        return mqttMessage;
+    };
     
 }

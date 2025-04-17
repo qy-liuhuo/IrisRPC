@@ -16,11 +16,20 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.core.listener;
+package io.github.qylh.iris.core.client;
 
-import io.github.qylh.iris.core.common.msg.MqttMsg;
+import io.github.qylh.iris.core.config.IrisConfig;
 
-public interface MqttMsgListener {
+public class ClientProxyFactory {
     
-    void onMessage(String topic, MqttMsg message);
+    private final Requester requestInvoker;
+    
+    public ClientProxyFactory(IrisConfig config) {
+        this.requestInvoker = new Requester(config);
+        this.requestInvoker.start();
+    }
+    
+    public <T> T getProxy(Class<?> serviceClazz) {
+        return new ClientProxy(this.requestInvoker, serviceClazz).getProxy();
+    }
 }

@@ -16,11 +16,7 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.core.listener;
+package io.github.qylh.iris.core.common.serializer;
 
-import io.github.qylh.iris.core.common.msg.MqttMsg;
-
-public interface MqttMsgListener {
-    
-    void onMessage(String topic, MqttMsg message);
+public interface Serializer {
 }

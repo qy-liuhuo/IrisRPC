@@ -16,30 +16,33 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.core.serializer;
+package io.github.qylh.iris.core.client;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import io.github.qylh.iris.core.common.msg.MqttResponse;
 
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class JsonSerializer implements Serializer {
+public class RPCCall extends CompletableFuture<MqttResponse> {
     
-    private static final JsonSerializerFacade facade = new JacksonSerializer();
+    private final int requestId;
     
-    public static <T> T deserialize(String text, Class<T> clazz) {
-        return facade.deserialize(text, clazz);
+    private static ConcurrentHashMap<Integer, RPCCall> calls = new ConcurrentHashMap<>();
+    
+    private RPCCall(int requestId) {
+        this.requestId = requestId;
+        calls.put(requestId, this);
     }
     
-    public static <T> T deserialize(String text, TypeReference<T> valueTypeRef) {
-        return facade.deserialize(text, valueTypeRef);
+    public static RPCCall makeRPCCall(int requestId) {
+        return new RPCCall(requestId);
     }
     
-    public static <T> List<T> deserializeArray(String text, Class<T> clazz) {
-        return facade.deserializeArray(text, clazz);
+    public static RPCCall getRPCCall(int requestId) {
+        return calls.get(requestId);
     }
     
-    public static String serialize(Object abj) {
-        return facade.serialize(abj);
+    public static void removeRPCCall(int requestId) {
+        calls.remove(requestId);
     }
-    
 }

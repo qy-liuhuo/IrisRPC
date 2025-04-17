@@ -16,7 +16,16 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.core.serializer;
+package io.github.qylh.iris.core.common.annotation;
 
-public interface Serializer {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Api {
+    
+    String name();
 }

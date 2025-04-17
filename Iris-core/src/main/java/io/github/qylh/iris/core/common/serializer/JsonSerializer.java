@@ -16,11 +16,30 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.core.listener;
+package io.github.qylh.iris.core.common.serializer;
 
-import io.github.qylh.iris.core.common.msg.MqttMsg;
+import com.fasterxml.jackson.core.type.TypeReference;
 
-public interface MqttMsgListener {
+import java.util.List;
+
+public class JsonSerializer implements Serializer {
     
-    void onMessage(String topic, MqttMsg message);
+    private static final JsonSerializerFacade facade = new JacksonSerializer();
+    
+    public static <T> T deserialize(String text, Class<T> clazz) {
+        return facade.deserialize(text, clazz);
+    }
+    
+    public static <T> T deserialize(String text, TypeReference<T> valueTypeRef) {
+        return facade.deserialize(text, valueTypeRef);
+    }
+    
+    public static <T> List<T> deserializeArray(String text, Class<T> clazz) {
+        return facade.deserializeArray(text, clazz);
+    }
+    
+    public static String serialize(Object abj) {
+        return facade.serialize(abj);
+    }
+    
 }

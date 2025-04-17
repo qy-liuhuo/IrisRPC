@@ -16,11 +16,16 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.core.listener;
+package io.github.qylh.iris.core.common.annotation;
 
-import io.github.qylh.iris.core.common.msg.MqttMsg;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface MqttMsgListener {
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface IrisService {
     
-    void onMessage(String topic, MqttMsg message);
+    String name();
 }

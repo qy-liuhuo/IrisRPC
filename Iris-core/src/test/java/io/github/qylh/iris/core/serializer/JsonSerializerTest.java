@@ -18,6 +18,7 @@
  */
 package io.github.qylh.iris.core.serializer;
 
+import io.github.qylh.iris.core.common.serializer.JsonSerializer;
 import lombok.Data;
 import org.junit.Assert;
 import org.junit.Test;
