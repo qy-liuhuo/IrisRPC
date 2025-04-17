@@ -10,12 +10,9 @@
     <name>IrisRPC</name>
     <url>http://maven.apache.org</url>
     <modules>
-        <module>Iris-common</module>
-        <module>Iris-server</module>
-        <module>Iris-client</module>
-        <module>Iris-demo</module>
+        <module>Iris-core</module>
         <module>Iris-spring-boot-starter</module>
-        <module>spring-demo</module>
+        <module>Iris-example</module>
     </modules>
 
     <properties>

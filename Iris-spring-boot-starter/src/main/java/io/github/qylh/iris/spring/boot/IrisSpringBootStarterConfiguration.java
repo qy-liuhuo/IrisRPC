@@ -1,8 +1,8 @@
 package io.github.qylh.iris.spring.boot;
 
-import io.github.qylh.iris.common.annotation.IrisService;
-import io.github.qylh.iris.common.config.MqttConnectionConfig;
-import io.github.qylh.iris.common.execption.MqttClientException;
+import io.github.qylh.iris.core.annotation.IrisService;
+import io.github.qylh.iris.core.config.MqttConnectionConfig;
+import io.github.qylh.iris.core.execption.MqttClientException;
 import io.github.qylh.iris.server.RequestProcessor;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
