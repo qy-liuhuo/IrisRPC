@@ -20,15 +20,39 @@ package io.github.qylh.iris.spring.boot;
 
 import io.github.qylh.iris.core.client.ClientProxyFactory;
 import io.github.qylh.iris.core.common.annotation.IrisRPC;
+import io.github.qylh.iris.core.common.constant.Constants;
+import io.github.qylh.iris.core.common.execption.MqttClientException;
+import io.github.qylh.iris.core.common.msg.MqttRegisterMsg;
+import io.github.qylh.iris.core.common.serializer.JsonSerializer;
 import io.github.qylh.iris.core.config.IrisConfig;
 import io.github.qylh.iris.core.config.MqttConnectionConfig;
+import io.github.qylh.iris.core.mqtt.MqttClient;
+import io.github.qylh.iris.core.mqtt.PahoMqttClient;
+import io.modelcontextprotocol.server.McpServerFeatures;
+import io.modelcontextprotocol.spec.McpSchema;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.ReflectionUtils;
 
-public class IrisReferenceBeanPostProcessor implements BeanPostProcessor {
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.*;
+
+public class IrisReferenceBeanPostProcessor implements BeanPostProcessor, SmartInitializingSingleton, ApplicationContextAware {
     
     private final ClientProxyFactory clientProxyFactory;
-    
+
+    private final IrisConfig irisConfig;
+
+    private ApplicationContext applicationContext;
+
+    private static Map<String, McpServerFeatures.SyncToolSpecification> syncToolSpecifications = new HashMap<>();
+
     public IrisReferenceBeanPostProcessor(IrisProperties irisProperties) {
         MqttConnectionConfig mqttConnectionConfig = MqttConnectionConfig.builder()
                 .broker(irisProperties.getBroker())
@@ -38,7 +62,7 @@ public class IrisReferenceBeanPostProcessor implements BeanPostProcessor {
                 .connectionTimeout(irisProperties.getConnectionTimeout())
                 .keepAliveInterval(irisProperties.getKeepAliveInterval())
                 .build();
-        IrisConfig irisConfig = IrisConfig.builder()
+        irisConfig = IrisConfig.builder()
                 .mqttConnectionConfig(mqttConnectionConfig)
                 .timeout(irisProperties.getTimeout())
                 .build();
@@ -55,5 +79,70 @@ public class IrisReferenceBeanPostProcessor implements BeanPostProcessor {
             }
         });
         return bean;
+    }
+
+    @Override
+    public void afterSingletonsInstantiated() {
+        MqttClient mqttClient = new PahoMqttClient();
+        String clientId = irisConfig.getMqttConnectionConfig().getClientId() + "_register";
+        try {
+            mqttClient.connect(irisConfig.getMqttConnectionConfig());
+            // 接收保留消息
+            mqttClient.subscribe_register(Constants.MQTT_REGISTER_TOPIC_SUFFIX + "#", (topic, message) -> {
+                try {
+                    MqttRegisterMsg msg = MqttRegisterMsg.fromPahoMqttMessage(message.toPahoMqttMessage());
+                    String serviceName = msg.getServiceName();
+                    Object serviceProxy = applicationContext.getBean(serviceName);
+                    Method method = serviceProxy.getClass().getMethod(msg.getMethodName());
+                    // 构造 tool
+                    String toolName = serviceName + msg.getMethodName();
+                    String toolDesc = msg.getServiceDesc() + msg.getMethodDesc();
+                    Map<String, Object> properties = new HashMap<>();
+                    List<String> required = new ArrayList<>();
+                    for(int i = 0; i < msg.getArgs().length; i++) {
+                        Map<String, Object> param = new HashMap<>();
+                        param.put("type", msg.getArgsType()[i].getSimpleName());
+                        param.put("desc", msg.getArgsDesc()[i]);
+                        properties.put(method.getParameters()[i].getName(), param);
+                        required.add("true");
+                    }
+                    McpSchema.JsonSchema toolSchema = new McpSchema.JsonSchema(
+                            "object",
+                            properties,
+                            required,
+                            false
+                    );
+                    McpSchema.Tool Tool = new McpSchema.Tool(toolName, toolDesc, toolSchema);
+                    McpServerFeatures.SyncToolSpecification syncToolSpecification = new McpServerFeatures.SyncToolSpecification(
+                            Tool,
+                            (exchange, arguments)->{
+                                Parameter[] methodParameters = method.getParameters();
+                                Object[] args = new Object[methodParameters.length];
+                                for (int i = 0; i < methodParameters.length; i++) {
+                                    args[i] = arguments.get(methodParameters[i].getName());
+                                }
+                                try {
+                                    Object res = method.invoke(serviceProxy, args);
+                                    McpSchema.TextContent resContent = new McpSchema.TextContent(JsonSerializer.serialize(res));
+                                    return new McpSchema.CallToolResult(List.of(resContent), false);
+                                } catch (IllegalAccessException | InvocationTargetException e) {
+                                    return new McpSchema.CallToolResult(null, true);
+                                }
+                            }
+                    );
+                    syncToolSpecifications.put(toolName, syncToolSpecification);
+                } catch (UnsupportedEncodingException | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+        } catch (MqttClientException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

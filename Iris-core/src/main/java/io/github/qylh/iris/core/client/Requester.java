@@ -54,6 +54,7 @@ public class Requester {
         try {
             mqttClient.connect(config.getMqttConnectionConfig());
             clientId = config.getMqttConnectionConfig().getClientId();
+            // 接收回调消息
             mqttClient.subscribe_response(Constants.MQTT_RESPONSE_TOPIC_SUFFIX + clientId, (topic, message) -> {
                 threadPoolExecutor.submit(() -> {
                     MqttResponse mqttResponse = (MqttResponse) message;

@@ -18,22 +18,27 @@
  */
 package io.github.qylh.iris.core.server;
 
-import io.github.qylh.iris.core.common.annotation.Api;
+import io.github.qylh.iris.core.common.annotation.IrisApi;
 import io.github.qylh.iris.core.common.annotation.IrisService;
+import io.github.qylh.iris.core.common.annotation.IrisTool;
+import io.github.qylh.iris.core.common.annotation.IrisToolParam;
 import io.github.qylh.iris.core.common.constant.Constants;
 import io.github.qylh.iris.core.common.execption.MqttClientException;
+import io.github.qylh.iris.core.common.msg.MqttRegisterMsg;
+import io.github.qylh.iris.core.common.msg.MqttRequest;
+import io.github.qylh.iris.core.common.msg.MqttResponse;
 import io.github.qylh.iris.core.config.MqttConnectionConfig;
 import io.github.qylh.iris.core.mqtt.MqttClient;
 import io.github.qylh.iris.core.mqtt.PahoMqttClient;
-import io.github.qylh.iris.core.common.msg.MqttRequest;
-import io.github.qylh.iris.core.common.msg.MqttResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class RequestProcessor {
     
@@ -78,12 +83,35 @@ public class RequestProcessor {
                     continue;
                 }
                 for (Method method : methods) {
-                    if (method.isAnnotationPresent(Api.class) || method.getDeclaringClass() == Object.class) {
+                    if (method.isAnnotationPresent(IrisApi.class) || method.getDeclaringClass() == Object.class) {
                         String apiName;
                         if (method.getDeclaringClass() == Object.class) {
                             apiName = method.getName();
                         } else {
-                            apiName = method.getAnnotation(Api.class).name();
+                            apiName = method.getAnnotation(IrisApi.class).name();
+                            if(method.getDeclaringClass().isAnnotationPresent(IrisTool.class)) {
+                                String registerTopic = Constants.MQTT_REGISTER_TOPIC_SUFFIX + serviceName + "/" + apiName;
+                                MqttRegisterMsg registerMsg = new MqttRegisterMsg();
+                                registerMsg.setServiceName(serviceName);
+                                registerMsg.setMethodName(method.getName());
+                                registerMsg.setServiceDesc(method.getAnnotation(IrisService.class).desc());
+                                registerMsg.setMethodName(method.getName());
+                                registerMsg.setMethodDesc(method.getDeclaringClass().getAnnotation(IrisTool.class).desc());
+                                Parameter[] parameters = method.getParameters();
+                                registerMsg.setArgs(parameters);
+                                registerMsg.setArgsType(method.getParameterTypes());
+                                registerMsg.setArgsDesc(Stream.of(parameters).map(
+                                        parameter -> {
+                                            if (parameter.isAnnotationPresent(IrisToolParam.class)){
+                                                return parameter.getAnnotation(IrisToolParam.class).desc();
+                                            }else{
+                                                return "";
+                                            }
+                                        }
+                                ).toArray(String[]::new));
+                                // 保留消息注册
+                                mqttClient.register(registerTopic, registerMsg);
+                            }
                         }
                         String fullName = Constants.MQTT_REQUEST_TOPIC_SUFFIX + serviceName + "/" + apiName;
                         mqttClient.subscribe_request(fullName, (topic, message) -> {

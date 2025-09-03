@@ -18,6 +18,7 @@
  */
 package io.github.qylh.iris.core.mqtt;
 
+import io.github.qylh.iris.core.common.msg.MqttRegisterMsg;
 import io.github.qylh.iris.core.config.MqttConnectionConfig;
 import io.github.qylh.iris.core.common.execption.MqttClientException;
 import io.github.qylh.iris.core.listener.MqttMsgListener;
@@ -37,10 +38,13 @@ public abstract class MqttClient {
     
     public abstract void subscribe_response(String topic, MqttMsgListener mqttMsgListener);
     public abstract void subscribe_response(String[] topics, MqttMsgListener mqttMsgListener);
-    
+
+    public abstract void subscribe_register(String topic, MqttMsgListener mqttMsgListener);
+
     public abstract void subscribe_payload(String topic, PayLoadListener payLoadListener);
     
     public abstract void unsubscribe(String topic);
     public abstract void unsubscribe(String[] topics);
     public abstract void disconnect();
+    public abstract void register(String topic, MqttRegisterMsg mqttRegisterMsg);
 }

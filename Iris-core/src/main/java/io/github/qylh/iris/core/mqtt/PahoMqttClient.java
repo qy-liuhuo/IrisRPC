@@ -18,13 +18,14 @@
  */
 package io.github.qylh.iris.core.mqtt;
 
-import io.github.qylh.iris.core.config.MqttConnectionConfig;
 import io.github.qylh.iris.core.common.execption.MqttClientException;
-import io.github.qylh.iris.core.listener.MqttMsgListener;
-import io.github.qylh.iris.core.listener.PayLoadListener;
 import io.github.qylh.iris.core.common.msg.MqttMsg;
+import io.github.qylh.iris.core.common.msg.MqttRegisterMsg;
 import io.github.qylh.iris.core.common.msg.MqttRequest;
 import io.github.qylh.iris.core.common.msg.MqttResponse;
+import io.github.qylh.iris.core.config.MqttConnectionConfig;
+import io.github.qylh.iris.core.listener.MqttMsgListener;
+import io.github.qylh.iris.core.listener.PayLoadListener;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -111,7 +112,7 @@ public class PahoMqttClient extends MqttClient {
             e.printStackTrace();
         }
     }
-    
+
     @Override
     public void subscribe_request(String[] topics, MqttMsgListener mqttMsgListener) {
         IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, MqttRequest.fromPahoMqttMessage((MqttMessage) message));
@@ -123,7 +124,7 @@ public class PahoMqttClient extends MqttClient {
             }
         }
     }
-    
+
     @Override
     public void subscribe_response(String topic, MqttMsgListener mqttMsgListener) {
         try {
@@ -133,7 +134,7 @@ public class PahoMqttClient extends MqttClient {
             e.printStackTrace();
         }
     }
-    
+
     @Override
     public void subscribe_response(String[] topics, MqttMsgListener mqttMsgListener) {
         IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, MqttResponse.fromPahoMqttMessage((MqttMessage) message));
@@ -145,7 +146,17 @@ public class PahoMqttClient extends MqttClient {
             }
         }
     }
-    
+
+    @Override
+    public void subscribe_register(String topic, MqttMsgListener mqttMsgListener) {
+        try {
+            IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, MqttRequest.fromPahoMqttMessage((MqttMessage) message));
+            this.mqttClient.subscribe(topic, iMqttMessageListener);
+        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void subscribe_payload(String topic, PayLoadListener payLoadListener) {
         try {
@@ -181,6 +192,20 @@ public class PahoMqttClient extends MqttClient {
         try {
             this.mqttClient.disconnect();
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 基于保留消息的tool能力注册
+     * @param topic
+     * @param msg
+     */
+    @Override
+    public void register(String topic, MqttRegisterMsg msg) {
+        try{
+            this.mqttClient.publish(topic, msg.toPahoMqttMessage().getPayload(), 1, true);
+        }catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             e.printStackTrace();
         }
     }

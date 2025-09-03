@@ -28,4 +28,6 @@ import java.lang.annotation.Target;
 public @interface IrisService {
     
     String name();
+
+    String desc() default "";
 }
