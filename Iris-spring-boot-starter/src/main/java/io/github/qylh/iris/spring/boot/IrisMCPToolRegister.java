@@ -1,5 +1,22 @@
+/*
+ *    Licensed to the Apache Software Foundation (ASF) under one
+ *    or more contributor license agreements.  See the NOTICE file
+ *    distributed with this work for additional information
+ *    regarding copyright ownership.  The ASF licenses this file
+ *    to you under the Apache License, Version 2.0 (the
+ *    "License"); you may not use this file except in compliance
+ *    with the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing,
+ *    software distributed under the License is distributed on an
+ *    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *    KIND, either express or implied.  See the License for the
+ *    specific language governing permissions and limitations
+ *    under the License.
+ */
 package io.github.qylh.iris.spring.boot;
-
 
 import io.github.qylh.iris.core.client.ClientProxyFactory;
 import io.github.qylh.iris.core.common.constant.Constants;
@@ -24,21 +41,21 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class IrisMCPToolRegister implements ApplicationContextAware {
-
+    
     private ApplicationContext applicationContext;
-
+    
     private static Map<String, McpServerFeatures.SyncToolSpecification> syncToolSpecifications = new ConcurrentHashMap<>();
-
+    
     private final MqttClient mqttClient;
-
+    
     private final ClientProxyFactory clientProxyFactory;
-
-    public IrisMCPToolRegister(MqttClient mqttClient,ClientProxyFactory clientProxyFactory) throws MqttClientException {
+    
+    public IrisMCPToolRegister(MqttClient mqttClient, ClientProxyFactory clientProxyFactory) throws MqttClientException {
         this.mqttClient = mqttClient;
         this.clientProxyFactory = new ClientProxyFactory(mqttClient);
         startListen();
     }
-
+    
     public void startListen() {
         mqttClient.subscribe_register(Constants.MQTT_REGISTER_TOPIC_SUFFIX + "#", (topic, message) -> {
             try {
@@ -48,22 +65,21 @@ public class IrisMCPToolRegister implements ApplicationContextAware {
                 throw new RuntimeException(e);
             }
         });
-
+        
     }
-
-
+    
     private void buildSyncToolSpecification(MqttRegisterMsg msg) throws NoSuchMethodException {
         String serviceName = msg.getServiceName();
         Class<?> interfaceType = msg.getInterfaceType();
         Object serviceProxy = clientProxyFactory.getProxy(interfaceType);
-//        Object serviceProxy = applicationContext.getBean(serviceName);
+        // Object serviceProxy = applicationContext.getBean(serviceName);
         Method method = serviceProxy.getClass().getMethod(msg.getMethodName());
         // 构造 tool
-        String toolName = serviceName+"-"+ msg.getMethodName();
+        String toolName = serviceName + "-" + msg.getMethodName();
         String toolDesc = msg.getServiceDesc() + msg.getMethodDesc();
         Map<String, Object> properties = new HashMap<>();
         List<String> required = new ArrayList<>();
-        for(int i = 0; i < msg.getArgsType().length; i++) {
+        for (int i = 0; i < msg.getArgsType().length; i++) {
             Map<String, Object> param = new HashMap<>();
             param.put("type", msg.getArgsType()[i].getSimpleName());
             param.put("desc", msg.getArgsDesc()[i]);
@@ -74,12 +90,11 @@ public class IrisMCPToolRegister implements ApplicationContextAware {
                 "object",
                 properties,
                 required,
-                false
-        );
+                false);
         McpSchema.Tool Tool = new McpSchema.Tool(toolName, toolDesc, toolSchema);
         McpServerFeatures.SyncToolSpecification syncToolSpecification = new McpServerFeatures.SyncToolSpecification(
                 Tool,
-                (exchange, arguments)->{
+                (exchange, arguments) -> {
                     Parameter[] methodParameters = method.getParameters();
                     Object[] args = new Object[methodParameters.length];
                     for (int i = 0; i < methodParameters.length; i++) {
@@ -92,15 +107,14 @@ public class IrisMCPToolRegister implements ApplicationContextAware {
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         return new McpSchema.CallToolResult(null, true);
                     }
-                }
-        );
+                });
         syncToolSpecifications.put(toolName, syncToolSpecification);
     }
-
+    
     private Map<String, McpServerFeatures.SyncToolSpecification> getSyncToolSpecifications() {
         return syncToolSpecifications;
     }
-
+    
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;

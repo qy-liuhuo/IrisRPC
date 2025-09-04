@@ -29,7 +29,7 @@ public class ClientProxyFactory {
         this.requestInvoker = new Requester(config);
         this.requestInvoker.start();
     }
-
+    
     public ClientProxyFactory(MqttClient mqttClient) {
         this.requestInvoker = new Requester(mqttClient);
         this.requestInvoker.start();

@@ -27,13 +27,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.ReflectionUtils;
 
-public class IrisReferenceBeanPostProcessor implements BeanPostProcessor, SmartInitializingSingleton, ApplicationContextAware{
-
+public class IrisReferenceBeanPostProcessor implements BeanPostProcessor, SmartInitializingSingleton, ApplicationContextAware {
+    
     private final ClientProxyFactory clientProxyFactory;
-
+    
     private ApplicationContext applicationContext;
-
-
+    
     public IrisReferenceBeanPostProcessor(ClientProxyFactory clientProxyFactory) {
         this.clientProxyFactory = clientProxyFactory;
     }
@@ -50,12 +49,12 @@ public class IrisReferenceBeanPostProcessor implements BeanPostProcessor, SmartI
         });
         return bean;
     }
-
+    
     @Override
     public void afterSingletonsInstantiated() {
-
+        
     }
-
+    
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;

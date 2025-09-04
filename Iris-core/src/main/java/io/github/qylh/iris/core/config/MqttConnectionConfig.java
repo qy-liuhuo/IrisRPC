@@ -32,7 +32,7 @@ public class MqttConnectionConfig implements Cloneable {
     private int connectionTimeout;
     private boolean cleanSession;
     private int keepAliveInterval;
-
+    
     @Override
     public MqttConnectionConfig clone() {
         try {

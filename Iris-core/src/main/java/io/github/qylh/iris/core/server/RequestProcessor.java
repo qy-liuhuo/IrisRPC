@@ -60,8 +60,8 @@ public class RequestProcessor {
         }
         register(serviceList);
     }
-
-    public void start(List<Class<?>> serviceList, MqttClient mqttClient){
+    
+    public void start(List<Class<?>> serviceList, MqttClient mqttClient) {
         this.mqttClient = mqttClient;
         register(serviceList);
     }
@@ -95,7 +95,7 @@ public class RequestProcessor {
                             apiName = method.getName();
                         } else {
                             apiName = method.getAnnotation(IrisApi.class).name();
-                            if(method.isAnnotationPresent(IrisTool.class)) {
+                            if (method.isAnnotationPresent(IrisTool.class)) {
                                 String registerTopic = Constants.MQTT_REGISTER_TOPIC_SUFFIX + serviceName + "/" + apiName;
                                 MqttRegisterMsg registerMsg = new MqttRegisterMsg();
                                 registerMsg.setQos(2);
@@ -110,13 +110,12 @@ public class RequestProcessor {
                                 registerMsg.setArgsType(method.getParameterTypes());
                                 registerMsg.setArgsDesc(Stream.of(parameters).map(
                                         parameter -> {
-                                            if (parameter.isAnnotationPresent(IrisToolParam.class)){
+                                            if (parameter.isAnnotationPresent(IrisToolParam.class)) {
                                                 return parameter.getAnnotation(IrisToolParam.class).desc();
-                                            }else{
+                                            } else {
                                                 return "";
                                             }
-                                        }
-                                ).toArray(String[]::new));
+                                        }).toArray(String[]::new));
                                 System.out.println(registerTopic);
                                 // 保留消息注册
                                 mqttClient.register(registerTopic, registerMsg);

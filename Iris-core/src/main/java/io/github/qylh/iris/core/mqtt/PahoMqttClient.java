@@ -107,12 +107,12 @@ public class PahoMqttClient extends MqttClient {
     public void subscribe_request(String topic, MqttMsgListener mqttMsgListener) {
         try {
             IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, MqttRequest.fromPahoMqttMessage((MqttMessage) message));
-            this.mqttClient.subscribe(topic,2, iMqttMessageListener);
+            this.mqttClient.subscribe(topic, 2, iMqttMessageListener);
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             e.printStackTrace();
         }
     }
-
+    
     @Override
     public void subscribe_request(String[] topics, MqttMsgListener mqttMsgListener) {
         IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, MqttRequest.fromPahoMqttMessage((MqttMessage) message));
@@ -124,7 +124,7 @@ public class PahoMqttClient extends MqttClient {
             }
         }
     }
-
+    
     @Override
     public void subscribe_response(String topic, MqttMsgListener mqttMsgListener) {
         try {
@@ -134,7 +134,7 @@ public class PahoMqttClient extends MqttClient {
             e.printStackTrace();
         }
     }
-
+    
     @Override
     public void subscribe_response(String[] topics, MqttMsgListener mqttMsgListener) {
         IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, MqttResponse.fromPahoMqttMessage((MqttMessage) message));
@@ -146,7 +146,7 @@ public class PahoMqttClient extends MqttClient {
             }
         }
     }
-
+    
     @Override
     public void subscribe_register(String topic, MqttMsgListener mqttMsgListener) {
         try {
@@ -156,7 +156,7 @@ public class PahoMqttClient extends MqttClient {
             e.printStackTrace();
         }
     }
-
+    
     @Override
     public void subscribe_payload(String topic, PayLoadListener payLoadListener) {
         try {
@@ -195,7 +195,7 @@ public class PahoMqttClient extends MqttClient {
             e.printStackTrace();
         }
     }
-
+    
     /**
      * 基于保留消息的tool能力注册
      * @param topic
@@ -203,13 +203,13 @@ public class PahoMqttClient extends MqttClient {
      */
     @Override
     public void register(String topic, MqttRegisterMsg msg) {
-        try{
+        try {
             this.mqttClient.publish(topic, msg.toPahoMqttMessage());
-        }catch (org.eclipse.paho.client.mqttv3.MqttException e) {
+        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             e.printStackTrace();
         }
     }
-
+    
     @Override
     public boolean isConnect() {
         return this.mqttClient.isConnected();

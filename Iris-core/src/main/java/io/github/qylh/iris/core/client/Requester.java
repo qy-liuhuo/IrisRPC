@@ -33,7 +33,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class Requester {
     
     private static final Logger logger = LoggerFactory.getLogger(Requester.class);
-
+    
     private MqttClient mqttClient;
     
     private IrisConfig config;
@@ -57,7 +57,7 @@ public class Requester {
             logger.error("Failed to connect to broker ReasonCode is:" + e.getMessage());
         }
     }
-
+    
     public Requester(MqttClient mqttClient) {
         this.mqttClient = mqttClient;
     }
@@ -73,10 +73,10 @@ public class Requester {
                 rpcCall.complete(mqttResponse);
             });
         });
-//        mqttClient.subscribe_register(Constants.MQTT_REGISTER_TOPIC_SUFFIX + "#", (topic, message) -> {
-//            System.out.println(message);
-//        });
-
+        // mqttClient.subscribe_register(Constants.MQTT_REGISTER_TOPIC_SUFFIX + "#", (topic, message) -> {
+        // System.out.println(message);
+        // });
+        
     }
     
     public MqttResponse request(MqttRequest request) {
