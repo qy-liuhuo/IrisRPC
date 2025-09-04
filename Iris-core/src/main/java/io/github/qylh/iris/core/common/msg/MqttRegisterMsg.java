@@ -11,7 +11,7 @@ import java.io.UnsupportedEncodingException;
 
 @Getter
 @Setter
-public class MqttRegisterMsg extends MqttMessage {
+public class MqttRegisterMsg extends MqttMsg {
 
     private String serviceName;
 
@@ -21,13 +21,11 @@ public class MqttRegisterMsg extends MqttMessage {
 
     private String methodDesc;
 
-    private Object[] args;
-
     private Class<?>[] argsType;
 
     private String[] argsDesc;
 
-    private int messageId;
+    private Class<?> interfaceType;
 
     public String toString() {
         return JsonSerializer.serialize(this);
@@ -42,6 +40,7 @@ public class MqttRegisterMsg extends MqttMessage {
         mqttMessage.setPayload(JsonSerializer.serialize(this).getBytes());
         mqttMessage.setQos(this.getQos());
         mqttMessage.setId(this.getMessageId());
+        mqttMessage.setRetained(true);
         return mqttMessage;
     }
 }

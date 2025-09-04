@@ -33,9 +33,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class Requester {
     
     private static final Logger logger = LoggerFactory.getLogger(Requester.class);
-    private final MqttClient mqttClient = new PahoMqttClient();
+
+    private MqttClient mqttClient;
     
-    private final IrisConfig config;
+    private IrisConfig config;
     
     private static final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
             10,
@@ -48,24 +49,34 @@ public class Requester {
     
     public Requester(IrisConfig config) {
         this.config = config;
-    }
-    
-    public void start() {
+        this.mqttClient = new PahoMqttClient();
+        this.mqttClient.setClientId(this.config.getMqttConnectionConfig().getClientId());
         try {
-            mqttClient.connect(config.getMqttConnectionConfig());
-            clientId = config.getMqttConnectionConfig().getClientId();
-            // 接收回调消息
-            mqttClient.subscribe_response(Constants.MQTT_RESPONSE_TOPIC_SUFFIX + clientId, (topic, message) -> {
-                threadPoolExecutor.submit(() -> {
-                    MqttResponse mqttResponse = (MqttResponse) message;
-                    int responseId = mqttResponse.getResponseId();
-                    RPCCall rpcCall = RPCCall.getRPCCall(responseId);
-                    rpcCall.complete(mqttResponse);
-                });
-            });
+            this.mqttClient.connect(config.getMqttConnectionConfig());
         } catch (MqttClientException e) {
             logger.error("Failed to connect to broker ReasonCode is:" + e.getMessage());
         }
+    }
+
+    public Requester(MqttClient mqttClient) {
+        this.mqttClient = mqttClient;
+    }
+    
+    public void start() {
+        clientId = mqttClient.getClientId();
+        // 接收回调消息
+        mqttClient.subscribe_response(Constants.MQTT_RESPONSE_TOPIC_SUFFIX + clientId, (topic, message) -> {
+            threadPoolExecutor.submit(() -> {
+                MqttResponse mqttResponse = (MqttResponse) message;
+                int responseId = mqttResponse.getResponseId();
+                RPCCall rpcCall = RPCCall.getRPCCall(responseId);
+                rpcCall.complete(mqttResponse);
+            });
+        });
+//        mqttClient.subscribe_register(Constants.MQTT_REGISTER_TOPIC_SUFFIX + "#", (topic, message) -> {
+//            System.out.println(message);
+//        });
+
     }
     
     public MqttResponse request(MqttRequest request) {
@@ -77,6 +88,7 @@ public class Requester {
         }
         RPCCall rpcCall = RPCCall.makeRPCCall(request.getRequestId());
         try {
+            // todo 设置超时时间
             return rpcCall.get();
         } catch (Exception e) {
             logger.error("Failed to get response ReasonCode is:" + e.getMessage());

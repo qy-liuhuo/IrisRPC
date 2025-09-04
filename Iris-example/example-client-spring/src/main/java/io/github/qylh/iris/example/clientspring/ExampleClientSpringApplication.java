@@ -18,10 +18,12 @@
  */
 package io.github.qylh.iris.example.clientspring;
 
+import io.github.qylh.iris.spring.boot.annotation.EnableIrisClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
+@EnableIrisClient
 public class ExampleClientSpringApplication {
     
     public static void main(String[] args) {

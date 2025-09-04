@@ -56,7 +56,7 @@ public class PahoMqttClient extends MqttClient {
         }
         mqttConnectOptions.setConnectionTimeout(mqttConnectionConfig.getConnectionTimeout());
         mqttConnectOptions.setKeepAliveInterval(mqttConnectionConfig.getKeepAliveInterval());
-        mqttConnectOptions.setCleanSession(true);
+        mqttConnectOptions.setCleanSession(mqttConnectionConfig.isCleanSession());
         mqttConnectOptions.setAutomaticReconnect(true);
         return mqttConnectOptions;
     }
@@ -107,7 +107,7 @@ public class PahoMqttClient extends MqttClient {
     public void subscribe_request(String topic, MqttMsgListener mqttMsgListener) {
         try {
             IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, MqttRequest.fromPahoMqttMessage((MqttMessage) message));
-            this.mqttClient.subscribe(topic, iMqttMessageListener);
+            this.mqttClient.subscribe(topic,2, iMqttMessageListener);
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             e.printStackTrace();
         }
@@ -150,7 +150,7 @@ public class PahoMqttClient extends MqttClient {
     @Override
     public void subscribe_register(String topic, MqttMsgListener mqttMsgListener) {
         try {
-            IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, MqttRequest.fromPahoMqttMessage((MqttMessage) message));
+            IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, MqttRegisterMsg.fromPahoMqttMessage((MqttMessage) message));
             this.mqttClient.subscribe(topic, iMqttMessageListener);
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             e.printStackTrace();
@@ -204,9 +204,14 @@ public class PahoMqttClient extends MqttClient {
     @Override
     public void register(String topic, MqttRegisterMsg msg) {
         try{
-            this.mqttClient.publish(topic, msg.toPahoMqttMessage().getPayload(), 1, true);
+            this.mqttClient.publish(topic, msg.toPahoMqttMessage());
         }catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean isConnect() {
+        return this.mqttClient.isConnected();
     }
 }

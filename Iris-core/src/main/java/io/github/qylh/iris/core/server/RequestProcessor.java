@@ -46,17 +46,23 @@ public class RequestProcessor {
     
     private Map<String, Object> serviceObjects = new HashMap<>();
     
-    private final MqttClient mqttClient = new PahoMqttClient();
+    private MqttClient mqttClient;
     
     private String clientId;
     
     public void start(List<Class<?>> serviceList, MqttConnectionConfig mqttConnectionConfig) throws MqttClientException {
         try {
+            mqttClient = new PahoMqttClient();
             mqttClient.connect(mqttConnectionConfig);
             clientId = mqttConnectionConfig.getClientId();
         } catch (MqttClientException e) {
             throw new MqttClientException("Failed to connect to broker ReasonCode is:" + e.getMessage());
         }
+        register(serviceList);
+    }
+
+    public void start(List<Class<?>> serviceList, MqttClient mqttClient){
+        this.mqttClient = mqttClient;
         register(serviceList);
     }
     
@@ -89,16 +95,18 @@ public class RequestProcessor {
                             apiName = method.getName();
                         } else {
                             apiName = method.getAnnotation(IrisApi.class).name();
-                            if(method.getDeclaringClass().isAnnotationPresent(IrisTool.class)) {
+                            if(method.isAnnotationPresent(IrisTool.class)) {
                                 String registerTopic = Constants.MQTT_REGISTER_TOPIC_SUFFIX + serviceName + "/" + apiName;
                                 MqttRegisterMsg registerMsg = new MqttRegisterMsg();
+                                registerMsg.setQos(2);
                                 registerMsg.setServiceName(serviceName);
                                 registerMsg.setMethodName(method.getName());
-                                registerMsg.setServiceDesc(method.getAnnotation(IrisService.class).desc());
+                                registerMsg.setServiceDesc(service.getAnnotation(IrisService.class).desc());
                                 registerMsg.setMethodName(method.getName());
-                                registerMsg.setMethodDesc(method.getDeclaringClass().getAnnotation(IrisTool.class).desc());
+                                registerMsg.setMethodDesc(method.getAnnotation(IrisTool.class).desc());
+                                // todo 必须把实现的接口放到第一个
+                                registerMsg.setInterfaceType(service.getInterfaces()[0]);
                                 Parameter[] parameters = method.getParameters();
-                                registerMsg.setArgs(parameters);
                                 registerMsg.setArgsType(method.getParameterTypes());
                                 registerMsg.setArgsDesc(Stream.of(parameters).map(
                                         parameter -> {
@@ -109,6 +117,7 @@ public class RequestProcessor {
                                             }
                                         }
                                 ).toArray(String[]::new));
+                                System.out.println(registerTopic);
                                 // 保留消息注册
                                 mqttClient.register(registerTopic, registerMsg);
                             }

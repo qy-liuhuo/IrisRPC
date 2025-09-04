@@ -19,6 +19,7 @@
 package io.github.qylh.iris.core.client;
 
 import io.github.qylh.iris.core.config.IrisConfig;
+import io.github.qylh.iris.core.mqtt.MqttClient;
 
 public class ClientProxyFactory {
     
@@ -26,6 +27,11 @@ public class ClientProxyFactory {
     
     public ClientProxyFactory(IrisConfig config) {
         this.requestInvoker = new Requester(config);
+        this.requestInvoker.start();
+    }
+
+    public ClientProxyFactory(MqttClient mqttClient) {
+        this.requestInvoker = new Requester(mqttClient);
         this.requestInvoker.start();
     }
     

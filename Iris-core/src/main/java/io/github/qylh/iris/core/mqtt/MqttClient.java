@@ -26,7 +26,17 @@ import io.github.qylh.iris.core.listener.PayLoadListener;
 import io.github.qylh.iris.core.common.msg.MqttMsg;
 
 public abstract class MqttClient {
-    
+
+    private String clientId;
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
     public abstract void connect(MqttConnectionConfig mqttConnectionConfig) throws MqttClientException;
     public abstract void publish(String topic, MqttMsg mqttMsg) throws MqttClientException;
     public abstract void publish(String[] topic, MqttMsg mqttMsg) throws MqttClientException;
@@ -47,4 +57,5 @@ public abstract class MqttClient {
     public abstract void unsubscribe(String[] topics);
     public abstract void disconnect();
     public abstract void register(String topic, MqttRegisterMsg mqttRegisterMsg);
+    public abstract boolean isConnect();
 }

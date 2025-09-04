@@ -18,12 +18,14 @@
  */
 package io.github.qylh.iris.example.serverspring;
 
+import io.github.qylh.iris.spring.boot.annotation.EnableIrisServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.IOException;
 
 @SpringBootApplication
+@EnableIrisServer
 public class ExampleServerSpringApplication {
     
     public static void main(String[] args) throws IOException {

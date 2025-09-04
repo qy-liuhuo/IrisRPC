@@ -21,14 +21,25 @@ package io.github.qylh.iris.core.config;
 import lombok.Builder;
 import lombok.Data;
 
-@Data
 @Builder
-public class MqttConnectionConfig {
+@Data
+public class MqttConnectionConfig implements Cloneable {
     
     private String broker;
     private String username;
     private String password;
     private String clientId;
     private int connectionTimeout;
+    private boolean cleanSession;
     private int keepAliveInterval;
+
+    @Override
+    public MqttConnectionConfig clone() {
+        try {
+            MqttConnectionConfig clone = (MqttConnectionConfig) super.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }
