@@ -65,6 +65,7 @@ public class PahoMqttClient extends MqttClient {
     public void publish(String topic, MqttMsg message) throws MqttClientException {
         message.setClientId(this.mqttClient.getClientId());
         try {
+            System.out.println("publish topic:" + topic);
             this.mqttClient.publish(topic, message.toPahoMqttMessage());
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             throw new MqttClientException(e.getMessage());

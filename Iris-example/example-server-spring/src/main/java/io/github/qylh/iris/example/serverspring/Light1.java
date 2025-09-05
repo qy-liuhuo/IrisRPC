@@ -25,7 +25,7 @@ import io.github.qylh.iris.core.common.annotation.IrisToolParam;
 import io.github.qylh.iris.example.common.LightControl;
 import org.springframework.stereotype.Service;
 
-@IrisService(name = "Light_room_1")
+@IrisService(name = "LightControl")
 @Service
 public class Light1 implements LightControl {
     
@@ -37,6 +37,7 @@ public class Light1 implements LightControl {
     @IrisTool(desc = "灯光是否开启")
     @IrisApi(name = "isOpen")
     public Boolean isOpen() {
+        System.out.println("执行检查灯光状态");
         return status;
     }
     

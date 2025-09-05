@@ -23,10 +23,14 @@ import io.github.qylh.iris.core.common.constant.Constants;
 import io.github.qylh.iris.core.common.execption.MqttClientException;
 import io.github.qylh.iris.core.common.msg.MqttRegisterMsg;
 import io.github.qylh.iris.core.common.serializer.JsonSerializer;
+import io.github.qylh.iris.core.config.MqttConnectionConfig;
 import io.github.qylh.iris.core.mqtt.MqttClient;
+import io.github.qylh.iris.core.mqtt.PahoMqttClient;
 import io.modelcontextprotocol.server.McpServerFeatures;
+import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -50,9 +54,26 @@ public class IrisMCPToolRegister implements ApplicationContextAware {
     
     private final ClientProxyFactory clientProxyFactory;
     
-    public IrisMCPToolRegister(MqttClient mqttClient, ClientProxyFactory clientProxyFactory) throws MqttClientException {
-        this.mqttClient = mqttClient;
-        this.clientProxyFactory = new ClientProxyFactory(mqttClient);
+    @Autowired
+    private McpSyncServer mcpSyncServer;
+    
+    public IrisMCPToolRegister(IrisProperties properties, ClientProxyFactory clientProxyFactory) throws MqttClientException {
+        MqttConnectionConfig mqttConnectionConfig = MqttConnectionConfig.builder()
+                .broker(properties.getBroker())
+                .username(properties.getUsername())
+                .password(properties.getPassword())
+                .clientId(properties.getClientId()+ "-registerListener")
+                .connectionTimeout(properties.getConnectionTimeout())
+                .keepAliveInterval(properties.getKeepAliveInterval())
+                .cleanSession(true)
+                .build();
+        this.mqttClient = new PahoMqttClient();
+        try {
+            this.mqttClient.connect(mqttConnectionConfig);
+        } catch (MqttClientException e) {
+            throw new RuntimeException("mqtt client connect error", e);
+        }
+        this.clientProxyFactory = clientProxyFactory;
         startListen();
     }
     
@@ -108,7 +129,9 @@ public class IrisMCPToolRegister implements ApplicationContextAware {
                         return new McpSchema.CallToolResult(null, true);
                     }
                 });
+        
         syncToolSpecifications.put(toolName, syncToolSpecification);
+        mcpSyncServer.addTool(syncToolSpecification);
     }
     
     private Map<String, McpServerFeatures.SyncToolSpecification> getSyncToolSpecifications() {

@@ -31,8 +31,7 @@ public class TestController {
     
     @GetMapping("/test")
     public String test() {
-        System.out.println("12345");
-        return testService.toString();
+        return testService.test(1);
     }
     
 }

@@ -116,12 +116,12 @@ public class RequestProcessor {
                                                 return "";
                                             }
                                         }).toArray(String[]::new));
-                                System.out.println(registerTopic);
                                 // 保留消息注册
                                 mqttClient.register(registerTopic, registerMsg);
                             }
                         }
                         String fullName = Constants.MQTT_REQUEST_TOPIC_SUFFIX + serviceName + "/" + apiName;
+                        System.out.println(fullName);
                         mqttClient.subscribe_request(fullName, (topic, message) -> {
                             MqttResponse mqttResponse = new MqttResponse();
                             MqttRequest mqttRequest = (MqttRequest) message;
@@ -138,6 +138,7 @@ public class RequestProcessor {
                                 mqttResponse.setMsg("Failed to invoke method :" + fullName);
                             } finally {
                                 try {
+                                    System.out.println(mqttResponse);
                                     mqttClient.publish(Constants.MQTT_RESPONSE_TOPIC_SUFFIX + message.getClientId(), mqttResponse);
                                 } catch (MqttClientException e) {
                                     Log.error("Failed to publish response" + e.getMessage());

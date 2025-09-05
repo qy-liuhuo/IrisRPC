@@ -68,15 +68,12 @@ public class Requester {
         mqttClient.subscribe_response(Constants.MQTT_RESPONSE_TOPIC_SUFFIX + clientId, (topic, message) -> {
             threadPoolExecutor.submit(() -> {
                 MqttResponse mqttResponse = (MqttResponse) message;
+                System.out.println(mqttResponse.toString());
                 int responseId = mqttResponse.getResponseId();
                 RPCCall rpcCall = RPCCall.getRPCCall(responseId);
                 rpcCall.complete(mqttResponse);
             });
         });
-        // mqttClient.subscribe_register(Constants.MQTT_REGISTER_TOPIC_SUFFIX + "#", (topic, message) -> {
-        // System.out.println(message);
-        // });
-        
     }
     
     public MqttResponse request(MqttRequest request) {
@@ -97,5 +94,4 @@ public class Requester {
             RPCCall.removeRPCCall(request.getRequestId());
         }
     }
-    
 }
