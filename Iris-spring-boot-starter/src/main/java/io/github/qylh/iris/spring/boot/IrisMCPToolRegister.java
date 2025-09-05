@@ -62,7 +62,7 @@ public class IrisMCPToolRegister implements ApplicationContextAware {
                 .broker(properties.getBroker())
                 .username(properties.getUsername())
                 .password(properties.getPassword())
-                .clientId(properties.getClientId()+ "-registerListener")
+                .clientId(properties.getClientId() + "-registerListener")
                 .connectionTimeout(properties.getConnectionTimeout())
                 .keepAliveInterval(properties.getKeepAliveInterval())
                 .cleanSession(true)

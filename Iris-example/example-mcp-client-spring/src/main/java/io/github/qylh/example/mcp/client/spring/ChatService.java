@@ -30,12 +30,12 @@ public class ChatService {
     private ChatClient chatClient;
     
     public String getResponse(String msg) {
-//        ChatClient.CallResponseSpec responseSpec = chatClient.prompt()
-//                .system("你是会使用工具的人工智能助手，请帮助用户解决问题")
-//                .user(msg)
-//                .call();
-//        System.out.println(responseSpec.chatResponse());
-//        return responseSpec.content();
+        // ChatClient.CallResponseSpec responseSpec = chatClient.prompt()
+        // .system("你是会使用工具的人工智能助手，请帮助用户解决问题")
+        // .user(msg)
+        // .call();
+        // System.out.println(responseSpec.chatResponse());
+        // return responseSpec.content();
         return chatClient.prompt().system("你是会使用工具的人工智能助手，请帮助用户解决问题").user(msg).call().content();
     }
     public Flux<String> getStreamResponse(String msg) {
