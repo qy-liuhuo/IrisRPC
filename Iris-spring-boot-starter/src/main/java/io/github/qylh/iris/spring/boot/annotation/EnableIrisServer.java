@@ -16,7 +16,10 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.core.common.annotation;
+package io.github.qylh.iris.spring.boot.annotation;
+
+import io.github.qylh.iris.spring.boot.RequestProcessorGenerator;
+import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -25,9 +28,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface IrisService {
-    
-    String name();
-    
-    String desc() default "";
+@Import({RequestProcessorGenerator.class})
+public @interface EnableIrisServer {
 }

@@ -16,20 +16,31 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.example.serverspring;
+package io.github.qylh.example.mcp.client.spring;
 
-import io.github.qylh.iris.spring.boot.annotation.EnableIrisServer;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.io.IOException;
+import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-@EnableIrisServer
-public class ExampleServerSpringApplication {
+public class ExampleMcpClientSpringApplication {
     
-    public static void main(String[] args) throws IOException {
-        SpringApplication.run(ExampleServerSpringApplication.class, args);
+    public static void main(String[] args) {
+        SpringApplication.run(ExampleMcpClientSpringApplication.class, args);
     }
     
+    @Bean
+    public CommandLineRunner commandLineRunner(ChatService chatService) {
+        return args -> {
+            System.out.println("Input:");
+            String input = System.console().readLine();
+            while (!input.equalsIgnoreCase("exit")) {
+                String response = chatService.getResponse(input);
+                System.out.println("Response: " + response);
+                System.out.println("Input:");
+                input = System.console().readLine();
+            }
+        };
+    }
 }

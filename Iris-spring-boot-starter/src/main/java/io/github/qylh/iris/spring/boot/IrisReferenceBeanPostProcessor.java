@@ -20,40 +20,43 @@ package io.github.qylh.iris.spring.boot;
 
 import io.github.qylh.iris.core.client.ClientProxyFactory;
 import io.github.qylh.iris.core.common.annotation.IrisRPC;
-import io.github.qylh.iris.core.config.IrisConfig;
-import io.github.qylh.iris.core.config.MqttConnectionConfig;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.ReflectionUtils;
 
-public class IrisReferenceBeanPostProcessor implements BeanPostProcessor {
+public class IrisReferenceBeanPostProcessor implements BeanPostProcessor, SmartInitializingSingleton, ApplicationContextAware {
     
     private final ClientProxyFactory clientProxyFactory;
     
-    public IrisReferenceBeanPostProcessor(IrisProperties irisProperties) {
-        MqttConnectionConfig mqttConnectionConfig = MqttConnectionConfig.builder()
-                .broker(irisProperties.getBroker())
-                .username(irisProperties.getUsername())
-                .password(irisProperties.getPassword())
-                .clientId(irisProperties.getClientId() + "-client")
-                .connectionTimeout(irisProperties.getConnectionTimeout())
-                .keepAliveInterval(irisProperties.getKeepAliveInterval())
-                .build();
-        IrisConfig irisConfig = IrisConfig.builder()
-                .mqttConnectionConfig(mqttConnectionConfig)
-                .timeout(irisProperties.getTimeout())
-                .build();
-        this.clientProxyFactory = new ClientProxyFactory(irisConfig);
+    private ApplicationContext applicationContext;
+    
+    public IrisReferenceBeanPostProcessor(ClientProxyFactory clientProxyFactory) {
+        this.clientProxyFactory = clientProxyFactory;
     }
     
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) {
         ReflectionUtils.doWithFields(bean.getClass(), field -> {
             if (field.isAnnotationPresent(IrisRPC.class)) {
+                System.out.println(bean);
                 Object serviceProxy = this.clientProxyFactory.getProxy(field.getType());
                 field.setAccessible(true);
                 field.set(bean, serviceProxy);
             }
         });
         return bean;
+    }
+    
+    @Override
+    public void afterSingletonsInstantiated() {
+        
+    }
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

@@ -17,6 +17,7 @@
         <module>example-server</module>
         <module>example-client-spring</module>
         <module>example-server-spring</module>
+        <module>example-mcp-client-spring</module>
     </modules>
 
     <properties>
@@ -46,5 +47,19 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 
 </project>

@@ -18,28 +18,35 @@
  */
 package io.github.qylh.iris.spring.boot;
 
-import io.github.qylh.iris.core.common.annotation.IrisService;
-import io.github.qylh.iris.core.config.MqttConnectionConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.qylh.iris.core.client.ClientProxyFactory;
 import io.github.qylh.iris.core.common.execption.MqttClientException;
-import io.github.qylh.iris.core.server.RequestProcessor;
+import io.github.qylh.iris.core.config.MqttConnectionConfig;
+import io.github.qylh.iris.core.mqtt.MqttClient;
+import io.github.qylh.iris.core.mqtt.PahoMqttClient;
+import io.modelcontextprotocol.server.McpServer;
+import io.modelcontextprotocol.server.McpSyncServer;
+import io.modelcontextprotocol.server.transport.WebMvcSseServerTransportProvider;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Map;
-import java.util.stream.Collectors;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.function.RouterFunction;
+import org.springframework.web.servlet.function.ServerResponse;
 
 @Configuration
 @EnableConfigurationProperties(IrisProperties.class)
+@EnableWebMvc
 public class IrisSpringBootStarterConfiguration implements ApplicationContextAware {
     
     private ApplicationContext applicationContext;
     
     @Bean
-    public RequestProcessor requestProcessor(IrisProperties properties) throws MqttClientException {
+    public MqttClient mqttClient(IrisProperties properties) {
         MqttConnectionConfig mqttConnectionConfig = MqttConnectionConfig.builder()
                 .broker(properties.getBroker())
                 .username(properties.getUsername())
@@ -47,24 +54,76 @@ public class IrisSpringBootStarterConfiguration implements ApplicationContextAwa
                 .clientId(properties.getClientId())
                 .connectionTimeout(properties.getConnectionTimeout())
                 .keepAliveInterval(properties.getKeepAliveInterval())
+                .cleanSession(true)
                 .build();
-        Map<String, Object> serviceBeans = applicationContext.getBeansWithAnnotation(IrisService.class);
-        RequestProcessor requestProcessor = new RequestProcessor();
-        for (Map.Entry<String, Object> entry : serviceBeans.entrySet()) {
-            String serviceName = entry.getValue().getClass().getAnnotation(IrisService.class).name();
-            if (serviceName == null || serviceName.isEmpty()) {
-                throw new RuntimeException("service name is empty");
-            }
-            requestProcessor.putService(serviceName, entry.getValue());
+        MqttClient mqttClient = new PahoMqttClient();
+        mqttClient.setClientId(mqttConnectionConfig.getClientId());
+        try {
+            mqttClient.connect(mqttConnectionConfig);
+        } catch (MqttClientException e) {
+            throw new RuntimeException("mqtt client connect error", e);
         }
-        requestProcessor.start(serviceBeans.values().stream().map(Object::getClass).collect(Collectors.toList()), mqttConnectionConfig);
-        return requestProcessor;
+        return mqttClient;
     }
     
     @Bean
-    public IrisReferenceBeanPostProcessor irisReferenceBeanPostProcessor(IrisProperties irisProperties) {
-        return new IrisReferenceBeanPostProcessor(irisProperties);
+    public ClientProxyFactory clientProxyFactory(MqttClient mqttClient) {
+        return new ClientProxyFactory(mqttClient);
     }
+    
+    @Bean
+    WebMvcSseServerTransportProvider webMvcSseServerTransportProvider(ObjectMapper mapper) {
+        return new WebMvcSseServerTransportProvider(mapper, "/mcp/message");
+    }
+    
+    @Bean
+    RouterFunction<ServerResponse> mcpRouterFunction(WebMvcSseServerTransportProvider transportProvider) {
+        return transportProvider.getRouterFunction();
+    }
+    
+    @Bean
+    McpSyncServer mcpSyncServer(WebMvcSseServerTransportProvider transportProvider) {
+        return McpServer.sync(transportProvider)
+                .serverInfo("iris-mqtt-tool-server", "1.0.0")
+                .capabilities(McpSchema.ServerCapabilities.builder()
+                        .resources(false, true) // Enable resource support
+                        .tools(true) // Enable tool support
+                        .logging() // Enable logging support
+                        .build())
+                .build();
+    }
+    // @Bean
+    // public RequestProcessor requestProcessor(IrisProperties properties) throws MqttClientException {
+    // MqttConnectionConfig mqttConnectionConfig = MqttConnectionConfig.builder()
+    // .broker(properties.getBroker())
+    // .username(properties.getUsername())
+    // .password(properties.getPassword())
+    // .clientId(properties.getClientId())
+    // .connectionTimeout(properties.getConnectionTimeout())
+    // .keepAliveInterval(properties.getKeepAliveInterval())
+    // .build();
+    // Map<String, Object> serviceBeans = applicationContext.getBeansWithAnnotation(IrisService.class);
+    // RequestProcessor requestProcessor = new RequestProcessor();
+    // for (Map.Entry<String, Object> entry : serviceBeans.entrySet()) {
+    // String serviceName = entry.getValue().getClass().getAnnotation(IrisService.class).name();
+    // if (serviceName == null || serviceName.isEmpty()) {
+    // throw new RuntimeException("service name is empty");
+    // }
+    // requestProcessor.putService(serviceName, entry.getValue());
+    // }
+    // requestProcessor.start(serviceBeans.values().stream().map(Object::getClass).collect(Collectors.toList()), mqttConnectionConfig);
+    // return requestProcessor;
+    // }
+    
+    // @Bean
+    // public IrisReferenceBeanPostProcessor irisReferenceBeanPostProcessor(IrisProperties irisProperties) {
+    // return new IrisReferenceBeanPostProcessor(irisProperties);
+    // }
+    //
+    // @Bean
+    // public IrisMCPToolRegister irisMCPToolRegister(IrisProperties irisProperties) throws MqttClientException {
+    // return new IrisMCPToolRegister(irisProperties);
+    // }
     
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

@@ -16,16 +16,19 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.core.common.annotation;
+package io.github.qylh.iris.spring.boot.annotation;
+
+import io.github.qylh.iris.spring.boot.IrisMCPToolRegister;
+import io.github.qylh.iris.spring.boot.IrisReferenceBeanPostProcessor;
+import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Api {
-    
-    String name();
+@Import({IrisReferenceBeanPostProcessor.class, IrisMCPToolRegister.class})
+public @interface EnableIrisClient {
 }

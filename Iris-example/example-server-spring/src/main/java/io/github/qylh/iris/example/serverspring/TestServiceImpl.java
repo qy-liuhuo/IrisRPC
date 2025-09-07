@@ -18,7 +18,7 @@
  */
 package io.github.qylh.iris.example.serverspring;
 
-import io.github.qylh.iris.core.common.annotation.Api;
+import io.github.qylh.iris.core.common.annotation.IrisApi;
 import io.github.qylh.iris.core.common.annotation.IrisService;
 import io.github.qylh.iris.example.common.TestService;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 public class TestServiceImpl implements TestService {
     
     @Override
-    @Api(name = "test")
+    @IrisApi(name = "test")
     public String test(Integer a) {
         return "Hello, this is a test message from TestServiceImpl!" + a;
     }

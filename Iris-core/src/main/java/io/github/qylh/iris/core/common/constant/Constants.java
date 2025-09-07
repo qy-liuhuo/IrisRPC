@@ -24,6 +24,8 @@ public class Constants {
     
     public static final String MQTT_RESPONSE_TOPIC_SUFFIX = "iris/response/";
     
+    public static final String MQTT_REGISTER_TOPIC_SUFFIX = "iris/register/";
+    
     public static final String MQTT_CHARSET_NAME = "UTF-8";
     
     public static final int IRIS_MQTT_SUCCESS = 0;

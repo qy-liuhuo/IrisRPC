@@ -19,13 +19,20 @@
 package io.github.qylh.iris.core.client;
 
 import io.github.qylh.iris.core.config.IrisConfig;
+import io.github.qylh.iris.core.mqtt.MqttClient;
 
 public class ClientProxyFactory {
     
+    // todo clientProxy 单例模式
     private final Requester requestInvoker;
     
     public ClientProxyFactory(IrisConfig config) {
         this.requestInvoker = new Requester(config);
+        this.requestInvoker.start();
+    }
+    
+    public ClientProxyFactory(MqttClient mqttClient) {
+        this.requestInvoker = new Requester(mqttClient);
         this.requestInvoker.start();
     }
     

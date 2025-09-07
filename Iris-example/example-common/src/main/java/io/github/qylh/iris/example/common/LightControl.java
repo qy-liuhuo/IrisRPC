@@ -16,18 +16,17 @@
  *    specific language governing permissions and limitations
  *    under the License.
  */
-package io.github.qylh.iris.core.common.annotation;
+package io.github.qylh.iris.example.common;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface IrisService {
+public interface LightControl {
     
-    String name();
+    public Boolean isOpen();
     
-    String desc() default "";
+    public Boolean openLight();
+    
+    public Boolean closeLight();
+    
+    public Integer setBrightness(Integer brightness);
+    
+    public Integer getBrightness();
 }
