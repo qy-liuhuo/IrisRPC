@@ -29,6 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class Requester {
     
@@ -84,9 +86,13 @@ public class Requester {
             return null;
         }
         RPCCall rpcCall = RPCCall.makeRPCCall(request.getRequestId());
+        long timeout = config != null ? config.getTimeout() : 10;
+        TimeUnit unit = config != null ? config.getTimeoutUnit() : TimeUnit.SECONDS;
         try {
-            // todo 设置超时时间
-            return rpcCall.get();
+            return rpcCall.get(timeout, unit);
+        } catch (TimeoutException e) {
+            logger.error("RPC call timeout after " + timeout + " " + unit.name());
+            return null;
         } catch (Exception e) {
             logger.error("Failed to get response ReasonCode is:" + e.getMessage());
             return null;

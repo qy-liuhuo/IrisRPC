@@ -23,6 +23,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import java.util.Scanner;
+
 @SpringBootApplication
 public class ExampleMcpClientSpringApplication {
     
@@ -33,13 +35,20 @@ public class ExampleMcpClientSpringApplication {
     @Bean
     public CommandLineRunner commandLineRunner(ChatService chatService) {
         return args -> {
+            Scanner scanner = new Scanner(System.in);
             System.out.println("Input:");
-            String input = System.console().readLine();
-            while (!input.equalsIgnoreCase("exit")) {
+            while (true) {
+                System.out.print("> ");
+                String input = scanner.nextLine(); // 替代 console.readLine()
+                
+                if ("exit".equalsIgnoreCase(input.trim())) {
+                    System.out.println("再见！");
+                    break;
+                }
+                
+                // 调用 ChatClient 处理
                 String response = chatService.getResponse(input);
-                System.out.println("Response: " + response);
-                System.out.println("Input:");
-                input = System.console().readLine();
+                System.out.println("AI: " + response);
             }
         };
     }

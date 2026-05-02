@@ -41,7 +41,7 @@ public class IrisReferenceBeanPostProcessor implements BeanPostProcessor, SmartI
     public Object postProcessBeforeInitialization(Object bean, String beanName) {
         ReflectionUtils.doWithFields(bean.getClass(), field -> {
             if (field.isAnnotationPresent(IrisRPC.class)) {
-                System.out.println(bean);
+                // System.out.println(bean);
                 Object serviceProxy = this.clientProxyFactory.getProxy(field.getType());
                 field.setAccessible(true);
                 field.set(bean, serviceProxy);
