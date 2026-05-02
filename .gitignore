@@ -24,3 +24,13 @@ hs_err_pid*
 replay_pid*
 
 docker-compose.yml
+
+# Maven build output
+target/
+
+# IDE - IntelliJ IDEA
+.idea/
+*.iml
+
+# Claude CLI / IDE
+.claude/

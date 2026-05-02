@@ -1,1 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=io.github.qylh.iris.spring.boot.IrisSpringBootStarterConfiguration

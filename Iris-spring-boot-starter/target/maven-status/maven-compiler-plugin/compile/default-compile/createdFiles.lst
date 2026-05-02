@@ -1,8 +1,0 @@
-io\github\qylh\iris\spring\boot\RequestProcessorGenerator.class
-io\github\qylh\iris\spring\boot\IrisMCPToolRegister.class
-io\github\qylh\iris\spring\boot\IrisReferenceBeanPostProcessor.class
-io\github\qylh\iris\spring\boot\IrisSpringBootStarterConfiguration.class
-io\github\qylh\iris\spring\boot\annotation\EnableIrisClient.class
-io\github\qylh\iris\spring\boot\IrisProperties.class
-io\github\qylh\iris\spring\boot\annotation\EnableIrisServer.class
-META-INF\spring-configuration-metadata.json
