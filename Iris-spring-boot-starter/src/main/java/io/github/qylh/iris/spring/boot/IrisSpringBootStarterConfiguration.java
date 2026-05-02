@@ -21,6 +21,7 @@ package io.github.qylh.iris.spring.boot;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.qylh.iris.core.client.ClientProxyFactory;
 import io.github.qylh.iris.core.common.execption.MqttClientException;
+import io.github.qylh.iris.core.config.IrisConfig;
 import io.github.qylh.iris.core.config.MqttConnectionConfig;
 import io.github.qylh.iris.core.mqtt.MqttClient;
 import io.github.qylh.iris.core.mqtt.PahoMqttClient;
@@ -35,6 +36,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import java.util.concurrent.TimeUnit;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
@@ -67,8 +69,22 @@ public class IrisSpringBootStarterConfiguration implements ApplicationContextAwa
     }
     
     @Bean
-    public ClientProxyFactory clientProxyFactory(MqttClient mqttClient) {
-        return new ClientProxyFactory(mqttClient);
+    public ClientProxyFactory clientProxyFactory(MqttClient mqttClient, IrisProperties properties) {
+        MqttConnectionConfig mqttConnectionConfig = MqttConnectionConfig.builder()
+                .broker(properties.getBroker())
+                .username(properties.getUsername())
+                .password(properties.getPassword())
+                .clientId(properties.getClientId())
+                .connectionTimeout(properties.getConnectionTimeout())
+                .keepAliveInterval(properties.getKeepAliveInterval())
+                .cleanSession(true)
+                .build();
+        IrisConfig irisConfig = IrisConfig.builder()
+                .mqttConnectionConfig(mqttConnectionConfig)
+                .timeout(properties.getTimeout())
+                .timeoutUnit(TimeUnit.SECONDS)
+                .build();
+        return new ClientProxyFactory(irisConfig);
     }
     
     @Bean
