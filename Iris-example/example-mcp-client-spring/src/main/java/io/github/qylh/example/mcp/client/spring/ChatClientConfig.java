@@ -18,31 +18,21 @@
  */
 package io.github.qylh.example.mcp.client.spring;
 
-import io.modelcontextprotocol.client.McpSyncClient;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-
 @Configuration
 public class ChatClientConfig {
-    
-    @Autowired
-    private List<McpSyncClient> mcpSyncClients;
     
     @Autowired
     ToolCallbackProvider tools;
     
     @Bean
     public ChatClient chatClient(OpenAiChatModel chatModel) {
-        for (ToolCallback toolCallback : tools.getToolCallbacks()) {
-            System.out.println(toolCallback.getToolDefinition());
-        }
         return ChatClient.builder(chatModel).defaultToolCallbacks(tools).build();
     }
 }

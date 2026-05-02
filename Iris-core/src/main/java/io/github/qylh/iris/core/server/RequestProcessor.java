@@ -89,39 +89,33 @@ public class RequestProcessor {
                     continue;
                 }
                 for (Method method : methods) {
-                    if (method.isAnnotationPresent(IrisApi.class) || method.getDeclaringClass() == Object.class) {
-                        String apiName;
-                        if (method.getDeclaringClass() == Object.class) {
-                            apiName = method.getName();
-                        } else {
-                            apiName = method.getAnnotation(IrisApi.class).name();
-                            if (method.isAnnotationPresent(IrisTool.class)) {
-                                String registerTopic = Constants.MQTT_REGISTER_TOPIC_SUFFIX + serviceName + "/" + apiName;
-                                MqttRegisterMsg registerMsg = new MqttRegisterMsg();
-                                registerMsg.setQos(2);
-                                registerMsg.setServiceName(serviceName);
-                                registerMsg.setMethodName(method.getName());
-                                registerMsg.setServiceDesc(service.getAnnotation(IrisService.class).desc());
-                                registerMsg.setMethodName(method.getName());
-                                registerMsg.setMethodDesc(method.getAnnotation(IrisTool.class).desc());
-                                // todo 必须把实现的接口放到第一个
-                                registerMsg.setInterfaceType(service.getInterfaces()[0]);
-                                Parameter[] parameters = method.getParameters();
-                                registerMsg.setArgsType(method.getParameterTypes());
-                                registerMsg.setArgsDesc(Stream.of(parameters).map(
-                                        parameter -> {
-                                            if (parameter.isAnnotationPresent(IrisToolParam.class)) {
-                                                return parameter.getAnnotation(IrisToolParam.class).desc();
-                                            } else {
-                                                return "";
-                                            }
-                                        }).toArray(String[]::new));
-                                // 保留消息注册
-                                mqttClient.register(registerTopic, registerMsg);
-                            }
+                    if (method.isAnnotationPresent(IrisApi.class)) {
+                        String apiName = method.getAnnotation(IrisApi.class).name();
+                        if (method.isAnnotationPresent(IrisTool.class)) {
+                            String registerTopic = Constants.MQTT_REGISTER_TOPIC_SUFFIX + serviceName + "/" + apiName;
+                            MqttRegisterMsg registerMsg = new MqttRegisterMsg();
+                            registerMsg.setQos(2);
+                            registerMsg.setServiceName(serviceName);
+                            registerMsg.setMethodName(method.getName());
+                            registerMsg.setServiceDesc(service.getAnnotation(IrisService.class).desc());
+                            registerMsg.setMethodDesc(method.getAnnotation(IrisTool.class).desc());
+                            // todo 必须把实现的接口放到第一个
+                            registerMsg.setInterfaceType(service.getInterfaces()[0]);
+                            Parameter[] parameters = method.getParameters();
+                            registerMsg.setArgsType(method.getParameterTypes());
+                            registerMsg.setArgsDesc(Stream.of(parameters).map(
+                                    parameter -> {
+                                        if (parameter.isAnnotationPresent(IrisToolParam.class)) {
+                                            return parameter.getAnnotation(IrisToolParam.class).desc();
+                                        } else {
+                                            return "";
+                                        }
+                                    }).toArray(String[]::new));
+                            // 保留消息注册
+                            mqttClient.register(registerTopic, registerMsg);
                         }
                         String fullName = Constants.MQTT_REQUEST_TOPIC_SUFFIX + serviceName + "/" + apiName;
-                        System.out.println(fullName);
+                        Log.debug("Subscribe request topic: {}", fullName);
                         mqttClient.subscribe_request(fullName, (topic, message) -> {
                             MqttResponse mqttResponse = new MqttResponse();
                             MqttRequest mqttRequest = (MqttRequest) message;
@@ -138,7 +132,7 @@ public class RequestProcessor {
                                 mqttResponse.setMsg("Failed to invoke method :" + fullName);
                             } finally {
                                 try {
-                                    System.out.println(mqttResponse);
+                                    Log.debug("Response: {}", mqttResponse);
                                     mqttClient.publish(Constants.MQTT_RESPONSE_TOPIC_SUFFIX + message.getClientId(), mqttResponse);
                                 } catch (MqttClientException e) {
                                     Log.error("Failed to publish response" + e.getMessage());

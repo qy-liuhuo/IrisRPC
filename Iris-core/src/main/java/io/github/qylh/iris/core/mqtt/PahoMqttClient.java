@@ -31,8 +31,12 @@ import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PahoMqttClient extends MqttClient {
+    
+    private static final Logger log = LoggerFactory.getLogger(PahoMqttClient.class);
     
     private org.eclipse.paho.client.mqttv3.MqttClient mqttClient;
     
@@ -65,7 +69,7 @@ public class PahoMqttClient extends MqttClient {
     public void publish(String topic, MqttMsg message) throws MqttClientException {
         message.setClientId(this.mqttClient.getClientId());
         try {
-            System.out.println("publish topic:" + topic);
+            log.debug("publish topic: {}", topic);
             this.mqttClient.publish(topic, message.toPahoMqttMessage());
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             throw new MqttClientException(e.getMessage());
@@ -110,7 +114,7 @@ public class PahoMqttClient extends MqttClient {
             IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, MqttRequest.fromPahoMqttMessage((MqttMessage) message));
             this.mqttClient.subscribe(topic, 2, iMqttMessageListener);
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-            e.printStackTrace();
+            log.error("MQTT client error", e);
         }
     }
     
@@ -121,7 +125,7 @@ public class PahoMqttClient extends MqttClient {
             try {
                 this.mqttClient.subscribe(t, iMqttMessageListener);
             } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-                e.printStackTrace();
+                log.error("MQTT client error", e);
             }
         }
     }
@@ -132,7 +136,7 @@ public class PahoMqttClient extends MqttClient {
             IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, MqttResponse.fromPahoMqttMessage((MqttMessage) message));
             this.mqttClient.subscribe(topic, iMqttMessageListener);
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-            e.printStackTrace();
+            log.error("MQTT client error", e);
         }
     }
     
@@ -143,7 +147,7 @@ public class PahoMqttClient extends MqttClient {
             try {
                 this.mqttClient.subscribe(t, iMqttMessageListener);
             } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-                e.printStackTrace();
+                log.error("MQTT client error", e);
             }
         }
     }
@@ -154,7 +158,7 @@ public class PahoMqttClient extends MqttClient {
             IMqttMessageListener iMqttMessageListener = (topic1, message) -> mqttMsgListener.onMessage(topic1, MqttRegisterMsg.fromPahoMqttMessage((MqttMessage) message));
             this.mqttClient.subscribe(topic, iMqttMessageListener);
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-            e.printStackTrace();
+            log.error("MQTT client error", e);
         }
     }
     
@@ -164,7 +168,7 @@ public class PahoMqttClient extends MqttClient {
             IMqttMessageListener iMqttMessageListener = (topic1, message) -> payLoadListener.onMessage(topic1, new String(message.getPayload()));
             this.mqttClient.subscribe(topic, iMqttMessageListener);
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-            e.printStackTrace();
+            log.error("MQTT client error", e);
         }
     }
     
@@ -173,7 +177,7 @@ public class PahoMqttClient extends MqttClient {
         try {
             this.mqttClient.unsubscribe(topic);
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-            e.printStackTrace();
+            log.error("MQTT client error", e);
         }
     }
     
@@ -183,7 +187,7 @@ public class PahoMqttClient extends MqttClient {
             try {
                 this.mqttClient.unsubscribe(t);
             } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-                e.printStackTrace();
+                log.error("MQTT client error", e);
             }
         }
     }
@@ -193,7 +197,7 @@ public class PahoMqttClient extends MqttClient {
         try {
             this.mqttClient.disconnect();
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-            e.printStackTrace();
+            log.error("MQTT client error", e);
         }
     }
     
@@ -207,7 +211,7 @@ public class PahoMqttClient extends MqttClient {
         try {
             this.mqttClient.publish(topic, msg.toPahoMqttMessage());
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-            e.printStackTrace();
+            log.error("MQTT client error", e);
         }
     }
     

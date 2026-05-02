@@ -29,11 +29,14 @@ import io.github.qylh.iris.core.mqtt.PahoMqttClient;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.spec.McpSchema;
+import javax.annotation.PostConstruct;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -46,6 +49,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class IrisMCPToolRegister implements ApplicationContextAware {
     
+    private static final Logger log = LoggerFactory.getLogger(IrisMCPToolRegister.class);
+    
     private ApplicationContext applicationContext;
     
     private static Map<String, McpServerFeatures.SyncToolSpecification> syncToolSpecifications = new ConcurrentHashMap<>();
@@ -54,7 +59,7 @@ public class IrisMCPToolRegister implements ApplicationContextAware {
     
     private final ClientProxyFactory clientProxyFactory;
     
-    @Autowired
+    @Autowired(required = false)
     private McpSyncServer mcpSyncServer;
     
     public IrisMCPToolRegister(IrisProperties properties, ClientProxyFactory clientProxyFactory) throws MqttClientException {
@@ -74,6 +79,10 @@ public class IrisMCPToolRegister implements ApplicationContextAware {
             throw new RuntimeException("mqtt client connect error", e);
         }
         this.clientProxyFactory = clientProxyFactory;
+    }
+    
+    @PostConstruct
+    public void init() {
         startListen();
     }
     
@@ -90,21 +99,31 @@ public class IrisMCPToolRegister implements ApplicationContextAware {
     }
     
     private void buildSyncToolSpecification(MqttRegisterMsg msg) throws NoSuchMethodException {
+        if (mcpSyncServer == null) {
+            log.warn("McpSyncServer not available, skip tool registration for: {}", msg.getServiceName());
+            return;
+        }
         String serviceName = msg.getServiceName();
         Class<?> interfaceType = msg.getInterfaceType();
         Object serviceProxy = clientProxyFactory.getProxy(interfaceType);
-        // Object serviceProxy = applicationContext.getBean(serviceName);
-        Method method = serviceProxy.getClass().getMethod(msg.getMethodName());
+        Class<?>[] argTypes = msg.getArgsType();
+        Method method = interfaceType.getMethod(msg.getMethodName(), argTypes);
         // 构造 tool
         String toolName = serviceName + "-" + msg.getMethodName();
         String toolDesc = msg.getServiceDesc() + msg.getMethodDesc();
         Map<String, Object> properties = new HashMap<>();
         List<String> required = new ArrayList<>();
-        for (int i = 0; i < msg.getArgsType().length; i++) {
+        Parameter[] parameters = method.getParameters();
+        for (int i = 0; i < parameters.length; i++) {
             Map<String, Object> param = new HashMap<>();
-            param.put("type", msg.getArgsType()[i].getSimpleName());
-            param.put("desc", msg.getArgsDesc()[i]);
-            properties.put(method.getParameters()[i].getName(), param);
+            param.put("type", toJsonType(argTypes[i]));
+            param.put("description", msg.getArgsDesc()[i]);
+            // 使用参数名（需 -parameters 编译），降级为 param_{i}
+            String paramName = parameters[i].getName();
+            if (paramName.startsWith("arg")) {
+                paramName = "param" + i;
+            }
+            properties.put(paramName, param);
             required.add("true");
         }
         McpSchema.JsonSchema toolSchema = new McpSchema.JsonSchema(
@@ -116,10 +135,13 @@ public class IrisMCPToolRegister implements ApplicationContextAware {
         McpServerFeatures.SyncToolSpecification syncToolSpecification = new McpServerFeatures.SyncToolSpecification(
                 Tool,
                 (exchange, arguments) -> {
-                    Parameter[] methodParameters = method.getParameters();
-                    Object[] args = new Object[methodParameters.length];
-                    for (int i = 0; i < methodParameters.length; i++) {
-                        args[i] = arguments.get(methodParameters[i].getName());
+                    Object[] args = new Object[parameters.length];
+                    for (int i = 0; i < parameters.length; i++) {
+                        String key = parameters[i].getName();
+                        if (key.startsWith("arg")) {
+                            key = "param" + i;
+                        }
+                        args[i] = arguments.get(key);
                     }
                     try {
                         Object res = method.invoke(serviceProxy, args);
@@ -136,6 +158,21 @@ public class IrisMCPToolRegister implements ApplicationContextAware {
     
     private Map<String, McpServerFeatures.SyncToolSpecification> getSyncToolSpecifications() {
         return syncToolSpecifications;
+    }
+    
+    private static String toJsonType(Class<?> javaType) {
+        if (javaType == Boolean.class || javaType == boolean.class) {
+            return "boolean";
+        } else if (javaType == Integer.class || javaType == int.class
+                || javaType == Long.class || javaType == long.class) {
+            return "integer";
+        } else if (javaType == Double.class || javaType == double.class
+                || javaType == Float.class || javaType == float.class) {
+            return "number";
+        } else if (javaType == String.class) {
+            return "string";
+        }
+        return "string";
     }
     
     @Override
