@@ -1,0 +1,28 @@
+name: Iris-CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+          cache: maven
+
+      - name: Code Style Check
+        run: mvn spotless:check
+
+      - name: Compile
+        run: mvn compile -Dspotless.check.skip=true
+
+      - name: Run Tests
+        run: mvn test -Dspotless.check.skip=true
+          
