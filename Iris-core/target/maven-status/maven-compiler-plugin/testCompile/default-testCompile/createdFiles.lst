@@ -1,0 +1,5 @@
+io\github\qylh\iris\core\env\MQTTContainerTestEnv.class
+io\github\qylh\iris\core\serializer\JsonSerializerTest.class
+io\github\qylh\iris\core\mqtt\client\PahoMqttClientTest$1.class
+io\github\qylh\iris\core\mqtt\client\PahoMqttClientTest.class
+io\github\qylh\iris\core\serializer\JsonSerializerTest$Person.class

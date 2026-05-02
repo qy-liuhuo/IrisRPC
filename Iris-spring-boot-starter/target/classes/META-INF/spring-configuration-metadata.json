@@ -1,0 +1,50 @@
+{
+  "groups": [
+    {
+      "name": "iris",
+      "type": "io.github.qylh.iris.spring.boot.IrisProperties",
+      "sourceType": "io.github.qylh.iris.spring.boot.IrisProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "iris.broker",
+      "type": "java.lang.String",
+      "sourceType": "io.github.qylh.iris.spring.boot.IrisProperties"
+    },
+    {
+      "name": "iris.client-id",
+      "type": "java.lang.String",
+      "sourceType": "io.github.qylh.iris.spring.boot.IrisProperties"
+    },
+    {
+      "name": "iris.connection-timeout",
+      "type": "java.lang.Integer",
+      "sourceType": "io.github.qylh.iris.spring.boot.IrisProperties",
+      "defaultValue": 0
+    },
+    {
+      "name": "iris.keep-alive-interval",
+      "type": "java.lang.Integer",
+      "sourceType": "io.github.qylh.iris.spring.boot.IrisProperties",
+      "defaultValue": 0
+    },
+    {
+      "name": "iris.password",
+      "type": "java.lang.String",
+      "sourceType": "io.github.qylh.iris.spring.boot.IrisProperties"
+    },
+    {
+      "name": "iris.timeout",
+      "type": "java.lang.Integer",
+      "sourceType": "io.github.qylh.iris.spring.boot.IrisProperties",
+      "defaultValue": 10
+    },
+    {
+      "name": "iris.username",
+      "type": "java.lang.String",
+      "sourceType": "io.github.qylh.iris.spring.boot.IrisProperties"
+    }
+  ],
+  "hints": []
+}

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="example-client" />
+        <module name="Iris-core" />
+        <module name="example-common" />
+        <module name="iris-spring-boot-starter" />
+        <module name="example-server" />
+        <module name="example-server-spring" />
+        <module name="example-mcp-client-spring" />
+        <module name="example-client-spring" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="example-client" target="17" />
+      <module name="example-client-spring" target="17" />
+      <module name="example-common" target="17" />
+      <module name="example-mcp-client-spring" target="17" />
+      <module name="example-server" target="17" />
+      <module name="example-server-spring" target="17" />
+      <module name="Iris-core" target="17" />
+      <module name="Iris-example" target="17" />
+      <module name="iris-spring-boot-starter" target="17" />
+      <module name="IrisRPC" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
